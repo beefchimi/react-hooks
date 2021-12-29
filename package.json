@@ -1,6 +1,7 @@
 {
   "name": "react-hooks",
   "version": "0.0.0",
+  "license": "ISC",
   "description": "A collection of useful React hooks.",
   "author": "Curtis Dulmage",
   "repository": "https://github.com/beefchimi/react-hooks",
