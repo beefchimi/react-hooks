@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import {useEffect, useRef} from 'react';
 
-import type { SetTimeoutId } from "../types";
-import type { TimeoutCallback, TimeoutHookOptions } from "./types";
+import type {SetTimeoutId} from '../types';
+import type {TimeoutCallback, TimeoutHookOptions} from './types';
 
 const DEFAULT_OPTIONS: Required<TimeoutHookOptions> = {
   duration: 0,
@@ -12,9 +12,9 @@ const DEFAULT_OPTIONS: Required<TimeoutHookOptions> = {
 // but would likely need to change the API.
 export function useTimeout(
   callback: TimeoutCallback,
-  options?: TimeoutHookOptions
+  options?: TimeoutHookOptions,
 ): void {
-  const { duration, playing } = {
+  const {duration, playing} = {
     ...DEFAULT_OPTIONS,
     ...options,
   };
