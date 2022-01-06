@@ -1,10 +1,21 @@
 {
   "name": "react-hooks",
   "version": "0.0.0",
-  "license": "ISC",
   "description": "A collection of useful React hooks.",
   "author": "Curtis Dulmage",
-  "repository": "https://github.com/beefchimi/react-hooks",
+  "license": "ISC",
+  "keywords": [
+    "react",
+    "hooks"
+  ],
+  "homepage": "https://github.com/beefchimi/react-hooks#readme",
+  "bugs": {
+    "url": "https://github.com/beefchimi/react-hooks/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beefchimi/react-hooks.git"
+  },
   "files": [
     "dist"
   ],
@@ -26,6 +37,7 @@
   "prettier": "@beefchimi/config-prettier",
   "scripts": {
     "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "test": "echo 'Testing...'",
     "build": "npm run clean && tsc && vite build",
     "clean": "rm -rf dist",
     "nuke": "npm run clean && rm -rf node_modules && rm -rf package-lock.json && npm cache clean --force"
