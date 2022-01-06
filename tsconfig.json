@@ -1,23 +1,21 @@
 {
+  "extends": "@beefchimi/config-typescript/library.json",
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "declarationDir": "dist/types",
-    "lib": ["esnext", "dom"],
+    "baseUrl": "./src",
+    "rootDir": ".",
+    // TODO: Worth considering if these rules
+    // should be the defaults from `library.json`.
     "jsx": "preserve",
-    "baseUrl": ".",
-    "strict": true,
+    "declarationDir": "dist/types",
+    "declarationMap": false,
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
     "esModuleInterop": false,
-    "isolatedModules": true,
-    "skipLibCheck": false,
-    "noEmit": true,
     "forceConsistentCasingInFileNames": true,
-    "useDefineForClassFields": true,
-    "resolveJsonModule": true
+    "noEmit": true,
+    "skipLibCheck": false,
+    "useDefineForClassFields": true
   },
-  "include": ["./src"]
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules/**/*"]
 }
