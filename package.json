@@ -37,7 +37,8 @@
   "prettier": "@beefchimi/config-prettier",
   "scripts": {
     "lint": "eslint 'src/**/*.{ts,tsx}'",
-    "test": "echo 'Testing...'",
+    "test": "vitest",
+    "coverage": "vitest --coverage",
     "build": "npm run clean && tsc && vite build",
     "clean": "rm -rf dist",
     "nuke": "npm run clean && rm -rf node_modules && rm -rf package-lock.json && npm cache clean --force"
@@ -50,8 +51,11 @@
     "@types/node": "^17.0.8",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
+    "@types/react-test-renderer": "^17.0.1",
     "@vitejs/plugin-react": "^1.1.4",
+    "react-test-renderer": "^17.0.2",
     "vite": "^2.7.10",
+    "vitest": "^0.0.139",
     "vite-plugin-dts": "^0.9.7"
   },
   "dependencies": {

@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "rootDir": ".",
+    "types": ["vitest/global"],
     // TODO: Worth considering if these rules
     // should be the defaults from `library.json`.
     "jsx": "preserve",
