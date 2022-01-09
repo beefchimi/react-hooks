@@ -32,9 +32,9 @@
     "node": ">=16.0.0"
   },
   "browserslist": [
-    "extends @beefchimi/config-browserslist"
+    "extends @beefchimi/browserslist-config"
   ],
-  "prettier": "@beefchimi/config-prettier",
+  "prettier": "@beefchimi/prettier-config",
   "scripts": {
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "test": "vitest",
@@ -44,10 +44,10 @@
     "nuke": "npm run clean && rm -rf node_modules && rm -rf package-lock.json && npm cache clean --force"
   },
   "devDependencies": {
-    "@beefchimi/config-browserslist": "^0.0.5",
-    "@beefchimi/config-prettier": "^0.0.5",
-    "@beefchimi/config-typescript": "^0.0.5",
-    "@beefchimi/eslint-plugin": "^0.0.5",
+    "@beefchimi/browserslist-config": "^0.0.7",
+    "@beefchimi/eslint-plugin": "^0.0.7",
+    "@beefchimi/prettier-config": "^0.0.7",
+    "@beefchimi/typescript-config": "^0.0.7",
     "@types/node": "^17.0.8",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",

@@ -1,5 +1,5 @@
 {
-  "extends": "@beefchimi/config-typescript/library.json",
+  "extends": "@beefchimi/typescript-config/library.json",
   "compilerOptions": {
     "baseUrl": "./src",
     "rootDir": ".",
