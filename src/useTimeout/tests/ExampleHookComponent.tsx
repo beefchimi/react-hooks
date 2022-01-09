@@ -1,29 +1,25 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {useTimeout} from '../useTimeout';
-import type {TimeoutHookOptions} from '../types';
+import type {TimeoutCallback, TimeoutHookOptions} from '../types';
 
 export interface ExampleHookComponentProps {
-  preTimeoutValue: string;
-  postTimeoutValue: string;
+  callback: TimeoutCallback;
   duration?: TimeoutHookOptions['duration'];
+  playing?: TimeoutHookOptions['playing'];
 }
 
 export function ExampleHookComponent({
-  preTimeoutValue,
-  postTimeoutValue,
+  callback,
   duration,
+  playing,
 }: ExampleHookComponentProps) {
-  const [activeValue, setActiveValue] = useState(preTimeoutValue);
+  const handleTimeoutEnd: TimeoutCallback = (timestamp) => callback(timestamp);
 
-  function handleTimeoutEnd() {
-    setActiveValue(postTimeoutValue);
-  }
-
-  useTimeout(handleTimeoutEnd, {duration});
+  useTimeout(handleTimeoutEnd, {duration, playing});
 
   return (
-    <div className="Parent">
-      <p className="Child">{activeValue}</p>
+    <div className="ExampleHookComponent">
+      <p>Example Hook Component</p>
     </div>
   );
 }

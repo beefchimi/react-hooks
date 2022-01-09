@@ -36,9 +36,11 @@ export default defineConfig({
         fs.promises
           .writeFile(BUILD_PATHS.dtsEntryFile, DTS_ENTRY_CONTENT)
           .then((_success) =>
+            // eslint-disable-next-line no-console
             console.log('The build types have been generated.'),
           )
           .catch(() =>
+            // eslint-disable-next-line no-console
             console.error('There was a problem processing the build.'),
           );
       },
