@@ -1,8 +1,9 @@
 {
-  "extends": "@beefchimi/config-typescript/library.json",
+  "extends": "@beefchimi/typescript-config/library.json",
   "compilerOptions": {
     "baseUrl": "./src",
     "rootDir": ".",
+    "types": ["vitest/global"],
     // TODO: Worth considering if these rules
     // should be the defaults from `library.json`.
     "jsx": "preserve",

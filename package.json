@@ -32,27 +32,31 @@
     "node": ">=16.0.0"
   },
   "browserslist": [
-    "extends @beefchimi/config-browserslist"
+    "extends @beefchimi/browserslist-config"
   ],
-  "prettier": "@beefchimi/config-prettier",
+  "prettier": "@beefchimi/prettier-config",
   "scripts": {
     "lint": "eslint 'src/**/*.{ts,tsx}'",
-    "test": "echo 'Testing...'",
+    "test": "vitest",
+    "coverage": "vitest --coverage",
     "build": "npm run clean && tsc && vite build",
     "clean": "rm -rf dist",
     "nuke": "npm run clean && rm -rf node_modules && rm -rf package-lock.json && npm cache clean --force"
   },
   "devDependencies": {
-    "@beefchimi/config-browserslist": "^0.0.5",
-    "@beefchimi/config-prettier": "^0.0.5",
-    "@beefchimi/config-typescript": "^0.0.5",
-    "@beefchimi/eslint-plugin": "^0.0.5",
+    "@beefchimi/browserslist-config": "^0.0.7",
+    "@beefchimi/eslint-plugin": "^0.0.7",
+    "@beefchimi/prettier-config": "^0.0.7",
+    "@beefchimi/typescript-config": "^0.0.7",
     "@types/node": "^17.0.8",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
+    "@types/react-test-renderer": "^17.0.1",
     "@vitejs/plugin-react": "^1.1.4",
+    "react-test-renderer": "^17.0.2",
     "vite": "^2.7.10",
-    "vite-plugin-dts": "^0.9.7"
+    "vitest": "^0.0.139",
+    "vite-plugin-dts": "^0.9.8"
   },
   "dependencies": {
     "react": "^17.0.2",

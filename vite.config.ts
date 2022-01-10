@@ -2,6 +2,7 @@ import fs from 'fs';
 import {defineConfig} from 'vite';
 import pluginReact from '@vitejs/plugin-react';
 import dtsPlugin from 'vite-plugin-dts';
+import type vitestTypes from 'vitest';
 
 const BUILD_PATHS = {
   dtsPluginOutput: '/dist/src/',
@@ -11,8 +12,14 @@ const BUILD_PATHS = {
 
 const DTS_ENTRY_CONTENT = `export * from './types/index';`;
 
+const testConfig: vitestTypes.InlineConfig = {
+  global: true,
+  // environment: 'happy-dom',
+};
+
 // TODO: Do we actually need to include React DOM?
 export default defineConfig({
+  test: testConfig,
   plugins: [
     pluginReact(),
     dtsPlugin({
@@ -29,9 +36,11 @@ export default defineConfig({
         fs.promises
           .writeFile(BUILD_PATHS.dtsEntryFile, DTS_ENTRY_CONTENT)
           .then((_success) =>
+            // eslint-disable-next-line no-console
             console.log('The build types have been generated.'),
           )
           .catch(() =>
+            // eslint-disable-next-line no-console
             console.error('There was a problem processing the build.'),
           );
       },
