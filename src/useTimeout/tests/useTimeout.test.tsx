@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {act, create, ReactTestRenderer} from 'react-test-renderer';
 import type vitestTypes from 'vitest';
 import {ExampleHookComponent} from './ExampleHookComponent';
 
@@ -23,7 +23,7 @@ describe('useTimeout', () => {
     test('Does not execute before the timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      renderer.create(
+      create(
         <ExampleHookComponent
           callback={mockCallback}
           duration={mockDuration}
@@ -38,7 +38,7 @@ describe('useTimeout', () => {
     test('Executes after timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      renderer.create(
+      create(
         <ExampleHookComponent
           callback={mockCallback}
           duration={mockDuration}
@@ -55,7 +55,7 @@ describe('useTimeout', () => {
     test('Executes `callback` immediately by default', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      renderer.create(<ExampleHookComponent callback={mockCallback} />);
+      create(<ExampleHookComponent callback={mockCallback} />);
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(0);
@@ -65,9 +65,7 @@ describe('useTimeout', () => {
     test('Executes `callback` immediately when `0`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      renderer.create(
-        <ExampleHookComponent callback={mockCallback} duration={0} />,
-      );
+      create(<ExampleHookComponent callback={mockCallback} duration={0} />);
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(0);
@@ -77,11 +75,12 @@ describe('useTimeout', () => {
 
   describe('playing', () => {
     const mockDuration = 100;
+    const halfDuration = mockDuration / 2;
 
     test('Does not execute when `false`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      renderer.create(
+      create(
         <ExampleHookComponent
           callback={mockCallback}
           duration={mockDuration}
@@ -91,6 +90,41 @@ describe('useTimeout', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration * 2);
+      expect(mockCallback).not.toHaveBeenCalled();
+    });
+
+    test('Will prevent `callback` from executing when toggled before expiration', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+
+      let component: ReactTestRenderer;
+
+      act(() => {
+        component = create(
+          <ExampleHookComponent
+            callback={mockCallback}
+            duration={mockDuration}
+          />,
+        );
+      });
+
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(halfDuration);
+
+      // NOTE: I'd probably prefer to see an `onClick` + state change
+      // over updating a prop directly.
+      act(() => {
+        component.update(
+          <ExampleHookComponent
+            callback={mockCallback}
+            duration={mockDuration}
+            playing={false}
+          />,
+        );
+      });
+
+      vi.advanceTimersByTime(mockDuration);
+
       expect(mockCallback).not.toHaveBeenCalled();
     });
   });

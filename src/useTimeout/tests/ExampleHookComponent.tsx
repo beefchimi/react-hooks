@@ -19,7 +19,7 @@ export function ExampleHookComponent({
 
   return (
     <div className="ExampleHookComponent">
-      <p>Example Hook Component</p>
+      <p className="Text">Example Hook Component.</p>
     </div>
   );
 }
