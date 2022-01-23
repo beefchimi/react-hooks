@@ -5,7 +5,7 @@ import {ExampleHookComponent} from './ExampleHookComponent';
 
 describe('useTimeout', () => {
   const mockTimeStamp = 1234567890;
-  let spyDateNow: vitestTypes.JestMockCompat<[], number> | null = null;
+  let spyDateNow: vitestTypes.SpyInstance<[], number> | null = null;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -20,7 +20,7 @@ describe('useTimeout', () => {
   describe('callback', () => {
     const mockDuration = 100;
 
-    test('Does not execute before the timeout has expired', () => {
+    it('does not execute before the timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(
@@ -35,7 +35,7 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    test('Executes after timeout has expired', () => {
+    it('executes after timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(
@@ -52,7 +52,7 @@ describe('useTimeout', () => {
   });
 
   describe('duration', () => {
-    test('Executes `callback` immediately by default', () => {
+    it('executes `callback` immediately by default', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(<ExampleHookComponent callback={mockCallback} />);
@@ -62,7 +62,7 @@ describe('useTimeout', () => {
       expect(mockCallback).toHaveBeenCalledWith(mockTimeStamp);
     });
 
-    test('Executes `callback` immediately when `0`', () => {
+    it('executes `callback` immediately when `0`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(<ExampleHookComponent callback={mockCallback} duration={0} />);
@@ -77,7 +77,7 @@ describe('useTimeout', () => {
     const mockDuration = 100;
     const halfDuration = mockDuration / 2;
 
-    test('Does not execute when `false`', () => {
+    it('does not execute when `false`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(
@@ -93,7 +93,7 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    test('Will prevent `callback` from executing when toggled before expiration', () => {
+    it('will prevent `callback` from executing when toggled before expiration', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       let component: ReactTestRenderer;
