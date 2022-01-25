@@ -40,9 +40,9 @@ export function useTimeout(
   useEffect(() => {
     if (playing) {
       timeoutRef.current = setTimeout(handleCallback, duration);
-
-      // TODO: Really stupid casting required by TypeScript
-      return () => clearTimeout(timeoutRef.current as unknown as number);
     }
+
+    // TODO: Really stupid casting required by TypeScript
+    return () => clearTimeout(timeoutRef.current as unknown as number);
   }, [duration, playing]);
 }
