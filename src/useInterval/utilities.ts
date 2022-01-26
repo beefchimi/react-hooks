@@ -2,8 +2,8 @@ import type {DelayFnArgs} from './types';
 
 export function getDelay({
   duration,
-  allowPausing,
   timeRemaining,
+  allowPausing,
   skipFirstInterval,
   firstIntervalPlayed,
 }: DelayFnArgs) {

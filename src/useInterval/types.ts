@@ -19,8 +19,8 @@ export interface IntervalTimeData {
 
 export interface DelayFnArgs {
   duration: NonNullable<IntervalHookOptions['duration']>;
-  allowPausing: NonNullable<IntervalHookOptions['allowPausing']>;
   timeRemaining: IntervalTimeData['timeRemaining'];
+  allowPausing: NonNullable<IntervalHookOptions['allowPausing']>;
   skipFirstInterval: NonNullable<IntervalHookOptions['skipFirstInterval']>;
   firstIntervalPlayed: boolean;
 }

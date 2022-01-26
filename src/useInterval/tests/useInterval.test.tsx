@@ -1,9 +1,9 @@
 import React from 'react';
 import {act, create, ReactTestRenderer} from 'react-test-renderer';
 import type vitestTypes from 'vitest';
-import {TimeoutComponent} from './TimeoutComponent';
+import {IntervalComponent} from './IntervalComponent';
 
-describe('useTimeout', () => {
+describe('useInterval', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -28,11 +28,11 @@ describe('useTimeout', () => {
 
     const mockDuration = 100;
 
-    it('does not execute before the timeout has expired', () => {
+    it('does not execute before the first interation has elapsed', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(
-        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
       );
 
       expect(mockCallback).not.toHaveBeenCalled();
@@ -40,15 +40,30 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('executes after timeout has expired', () => {
+    it('executes once after first iteration', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(
-        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
       );
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledWith(mockTimeStamp);
+    });
+
+    it('executes multiple times after enough time has passed', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+
+      create(
+        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
+      );
+
+      expect(mockCallback).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(mockDuration * 3);
+
+      expect(mockCallback).toHaveBeenCalledTimes(3);
       expect(mockCallback).toHaveBeenCalledWith(mockTimeStamp);
     });
   });
@@ -57,7 +72,7 @@ describe('useTimeout', () => {
     it('executes `callback` immediately by default', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      create(<TimeoutComponent callback={mockCallback} />);
+      create(<IntervalComponent callback={mockCallback} />);
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
@@ -67,7 +82,7 @@ describe('useTimeout', () => {
     it('executes `callback` immediately when `0`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      create(<TimeoutComponent callback={mockCallback} duration={0} />);
+      create(<IntervalComponent callback={mockCallback} duration={0} />);
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
@@ -82,7 +97,7 @@ describe('useTimeout', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       create(
-        <TimeoutComponent
+        <IntervalComponent
           callback={mockCallback}
           duration={mockDuration}
           playing={false}
@@ -100,7 +115,7 @@ describe('useTimeout', () => {
 
       act(() => {
         component = create(
-          <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+          <IntervalComponent callback={mockCallback} duration={mockDuration} />,
         );
       });
 
@@ -110,7 +125,7 @@ describe('useTimeout', () => {
 
       act(() => {
         component.update(
-          <TimeoutComponent
+          <IntervalComponent
             callback={mockCallback}
             duration={mockDuration}
             playing={false}
@@ -123,13 +138,13 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('will restart the timeout from the beginning when toggled back and forth', () => {
+    it('will restart the timeout from the beginning when toggled back and forth without `allowPausing`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
       let component: ReactTestRenderer;
 
       act(() => {
         component = create(
-          <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+          <IntervalComponent callback={mockCallback} duration={mockDuration} />,
         );
       });
 
@@ -139,7 +154,7 @@ describe('useTimeout', () => {
 
       act(() => {
         component.update(
-          <TimeoutComponent
+          <IntervalComponent
             callback={mockCallback}
             duration={mockDuration}
             playing={false}
@@ -153,7 +168,7 @@ describe('useTimeout', () => {
 
       act(() => {
         component.update(
-          <TimeoutComponent
+          <IntervalComponent
             callback={mockCallback}
             duration={mockDuration}
             playing
@@ -166,6 +181,90 @@ describe('useTimeout', () => {
 
       vi.advanceTimersByTime(1);
       expect(mockCallback).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('allowPausing', () => {
+    const mockDuration = 100;
+    const pauseOffset = 10;
+
+    it('will restart the timeout from the paused position when toggled back and forth', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+      let component: ReactTestRenderer;
+
+      act(() => {
+        component = create(
+          <IntervalComponent
+            callback={mockCallback}
+            duration={mockDuration}
+            allowPausing
+          />,
+        );
+      });
+
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(mockDuration - pauseOffset);
+
+      act(() => {
+        component.update(
+          <IntervalComponent
+            callback={mockCallback}
+            duration={mockDuration}
+            playing={false}
+            allowPausing
+          />,
+        );
+      });
+
+      vi.advanceTimersByTime(mockDuration);
+
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      act(() => {
+        component.update(
+          <IntervalComponent
+            callback={mockCallback}
+            duration={mockDuration}
+            playing
+            allowPausing
+          />,
+        );
+      });
+
+      vi.advanceTimersByTime(pauseOffset - 1);
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1);
+      expect(mockCallback).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('skipFirstInterval', () => {
+    const mockDuration = 100;
+
+    it('will fire immediately then resume execution at defined intervals', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+
+      create(
+        <IntervalComponent
+          callback={mockCallback}
+          duration={mockDuration}
+          skipFirstInterval
+        />,
+      );
+
+      vi.advanceTimersByTime(1);
+      expect(mockCallback).toHaveBeenCalledOnce();
+
+      vi.advanceTimersByTime(mockDuration - 1);
+      expect(mockCallback).not.toHaveBeenCalledTimes(2);
+
+      vi.advanceTimersByTime(1);
+      expect(mockCallback).toHaveBeenCalledTimes(2);
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).toHaveBeenCalledTimes(3);
     });
   });
 });

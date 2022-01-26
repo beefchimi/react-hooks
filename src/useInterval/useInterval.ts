@@ -40,10 +40,10 @@ export function useInterval(
   const timeRemaining = useRef(initialTimeData.timeRemaining);
 
   /*
-    const [timeData, setTimeData] = useState<IntervalHookReturn>({
-        ...initialTimeData
-    });
-    */
+  const [timeData, setTimeData] = useState<IntervalHookReturn>({
+      ...initialTimeData
+  });
+  */
 
   const resetTimeData = useCallback(() => {
     // progress.current = initialTimeData.progress;
@@ -73,7 +73,7 @@ export function useInterval(
       // setTimeData({ ...initialTimeData });
 
       if (!skipFirstInterval && !firstIntervalPlayed.current) {
-        // NOTE: Need to call this right away or else the
+        // NOTE: Need to set this right away or else the
         // very first `pause` will not record `timeRemaining`.
         startTime.current = Date.now();
       }
@@ -96,12 +96,6 @@ export function useInterval(
 
         intervalRef.current = setInterval(handleCallback, duration);
       }, delay);
-
-      return () => {
-        // TODO: Really stupid casting required by TypeScript
-        clearInterval(intervalRef.current as unknown as number);
-        clearTimeout(timeoutRef.current as unknown as number);
-      };
     }
 
     if (!playing && startTime.current && duration) {
@@ -111,12 +105,18 @@ export function useInterval(
       timeRemaining.current = duration - timeDiff;
 
       /*
-            setTimeData({
-                progress: progress.current,
-                timeRemaining: timeRemaining.current
-            });
-            */
+      setTimeData({
+          progress: progress.current,
+          timeRemaining: timeRemaining.current
+      });
+      */
     }
+
+    return () => {
+      // TODO: Really stupid casting required by TypeScript
+      clearInterval(intervalRef.current as unknown as number);
+      clearTimeout(timeoutRef.current as unknown as number);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration, playing, allowPausing]);
 
