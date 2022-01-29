@@ -4,22 +4,28 @@ import type vitestTypes from 'vitest';
 import {TimeoutComponent} from './TimeoutComponent';
 
 describe('useTimeout', () => {
+  let mockTimestamp = 0;
+
   beforeEach(() => {
+    const mockDate = new Date(1988, 10, 1);
+    mockTimestamp = mockDate.valueOf();
+
     vi.useFakeTimers();
+    vi.setSystemTime(mockDate);
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
     vi.useRealTimers();
   });
 
   describe('callback', () => {
-    const mockTimeStamp = 1234567890;
     let spyDateNow: vitestTypes.SpyInstance<[], number> | null = null;
 
     beforeEach(() => {
       spyDateNow = vi
         .spyOn(Date, 'now')
-        .mockImplementation(() => mockTimeStamp);
+        .mockImplementation(() => mockTimestamp);
     });
 
     afterEach(() => {
@@ -49,7 +55,7 @@ describe('useTimeout', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration);
-      expect(mockCallback).toHaveBeenCalledWith(mockTimeStamp);
+      expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
   });
 

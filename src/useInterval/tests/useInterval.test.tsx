@@ -4,22 +4,28 @@ import type vitestTypes from 'vitest';
 import {IntervalComponent} from './IntervalComponent';
 
 describe('useInterval', () => {
+  let mockTimestamp = 0;
+
   beforeEach(() => {
+    const mockDate = new Date(1988, 10, 1);
+    mockTimestamp = mockDate.valueOf();
+
     vi.useFakeTimers();
+    vi.setSystemTime(mockDate);
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
     vi.useRealTimers();
   });
 
   describe('callback', () => {
-    const mockTimeStamp = 1234567890;
     let spyDateNow: vitestTypes.SpyInstance<[], number> | null = null;
 
     beforeEach(() => {
       spyDateNow = vi
         .spyOn(Date, 'now')
-        .mockImplementation(() => mockTimeStamp);
+        .mockImplementation(() => mockTimestamp);
     });
 
     afterEach(() => {
@@ -50,7 +56,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).toHaveBeenCalledOnce();
-      expect(mockCallback).toHaveBeenCalledWith(mockTimeStamp);
+      expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
 
     it('executes multiple times after enough time has passed', () => {
@@ -64,7 +70,7 @@ describe('useInterval', () => {
       vi.advanceTimersByTime(mockDuration * 3);
 
       expect(mockCallback).toHaveBeenCalledTimes(3);
-      expect(mockCallback).toHaveBeenCalledWith(mockTimeStamp);
+      expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
   });
 
