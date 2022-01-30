@@ -1,14 +1,11 @@
 import {useCallback, useEffect, useRef} from 'react';
 
-import type {SetIntervalId} from '../types';
 import type {
   IntervalCallback,
   IntervalHookOptions,
   IntervalTimeData,
 } from './types';
 import {getDelay} from './utilities';
-
-export type SetTimeoutId = ReturnType<typeof setTimeout>;
 
 const DEFAULT_OPTIONS: Required<IntervalHookOptions> = {
   duration: 0,
@@ -32,8 +29,8 @@ export function useInterval(
   };
 
   const callbackRef = useRef<IntervalCallback>();
-  const intervalRef = useRef<SetIntervalId>();
-  const timeoutRef = useRef<SetTimeoutId>();
+  const intervalRef = useRef<number>();
+  const timeoutRef = useRef<number>();
 
   const firstIntervalPlayed = useRef(false);
 
@@ -89,14 +86,14 @@ export function useInterval(
       });
 
       // TODO: Should we use the `useTimeout()` hook instead?
-      timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = window.setTimeout(() => {
         handleCallback();
 
         if (!firstIntervalPlayed.current) {
           firstIntervalPlayed.current = true;
         }
 
-        intervalRef.current = setInterval(handleCallback, duration);
+        intervalRef.current = window.setInterval(handleCallback, duration);
       }, delay);
     }
 
@@ -115,9 +112,8 @@ export function useInterval(
     }
 
     return () => {
-      // TODO: Really stupid casting required by TypeScript
-      clearInterval(intervalRef.current as unknown as number);
-      clearTimeout(timeoutRef.current as unknown as number);
+      window.clearInterval(intervalRef.current);
+      window.clearTimeout(timeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration, playing, allowPausing]);
