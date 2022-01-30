@@ -1,12 +1,14 @@
 import {useCallback, useEffect, useRef} from 'react';
 
-import type {SetIntervalId, SetTimeoutId} from '../types';
+import type {SetIntervalId} from '../types';
 import type {
   IntervalCallback,
   IntervalHookOptions,
   IntervalTimeData,
 } from './types';
 import {getDelay} from './utilities';
+
+export type SetTimeoutId = ReturnType<typeof setTimeout>;
 
 const DEFAULT_OPTIONS: Required<IntervalHookOptions> = {
   duration: 0,

@@ -1,4 +1,4 @@
-export type {SetIntervalId, SetTimeoutId} from './types';
+export type {SetIntervalId} from './types';
 
 export * from './useInterval';
 export * from './useIsoLayoutEffect';
