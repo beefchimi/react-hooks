@@ -1,6 +1,7 @@
 import {useEffect, useRef} from 'react';
 
 import {filterNullishValuesFromObject} from '../utilities';
+import type {SetTimeoutId} from '../types';
 import type {TimeoutCallback, TimeoutHookOptions} from './types';
 
 const DEFAULT_OPTIONS: Required<TimeoutHookOptions> = {
@@ -26,7 +27,7 @@ export function useTimeout(
   };
 
   const callbackRef = useRef<TimeoutCallback>();
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<SetTimeoutId>();
 
   function handleCallback() {
     callbackRef.current?.(Date.now());
@@ -38,9 +39,10 @@ export function useTimeout(
 
   useEffect(() => {
     if (playing) {
-      timeoutRef.current = window.setTimeout(handleCallback, duration);
+      timeoutRef.current = setTimeout(handleCallback, duration);
     }
 
-    return () => window.clearTimeout(timeoutRef.current);
+    // TODO: Unfortunate typecasting because of dual DOM/Node environment.
+    return () => clearTimeout(timeoutRef.current as unknown as number);
   }, [duration, playing]);
 }
