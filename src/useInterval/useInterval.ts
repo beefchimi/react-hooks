@@ -113,7 +113,7 @@ export function useInterval(
     }
 
     return () => {
-      // TODO: Really stupid casting required by TypeScript
+      // TODO: Unfortunate typecasting because of dual DOM/Node environment.
       clearInterval(intervalRef.current as unknown as number);
       clearTimeout(timeoutRef.current as unknown as number);
     };

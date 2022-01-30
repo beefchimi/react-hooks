@@ -1,6 +1,8 @@
 import React from 'react';
-import {act, create, ReactTestRenderer} from 'react-test-renderer';
+import {act} from 'react-test-renderer';
 import type vitestTypes from 'vitest';
+
+import {mount} from '../../utilities';
 import {TimeoutComponent} from './TimeoutComponent';
 
 describe('useTimeout', () => {
@@ -37,7 +39,7 @@ describe('useTimeout', () => {
     it('does not execute before the timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      create(
+      mount(
         <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
       );
 
@@ -49,7 +51,7 @@ describe('useTimeout', () => {
     it('executes after timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      create(
+      mount(
         <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
       );
 
@@ -63,7 +65,7 @@ describe('useTimeout', () => {
     it('executes `callback` immediately by default', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      create(<TimeoutComponent callback={mockCallback} />);
+      mount(<TimeoutComponent callback={mockCallback} />);
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
@@ -73,7 +75,7 @@ describe('useTimeout', () => {
     it('executes `callback` immediately when `0`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      create(<TimeoutComponent callback={mockCallback} duration={0} />);
+      mount(<TimeoutComponent callback={mockCallback} duration={0} />);
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
@@ -87,7 +89,7 @@ describe('useTimeout', () => {
     it('does not execute when `false`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      create(
+      mount(
         <TimeoutComponent
           callback={mockCallback}
           duration={mockDuration}
@@ -102,20 +104,15 @@ describe('useTimeout', () => {
 
     it('will prevent `callback` from executing when toggled before expiration', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
-      let component: ReactTestRenderer;
-
-      act(() => {
-        component = create(
-          <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
-        );
-      });
+      const wrapper = mount(
+        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+      );
 
       expect(mockCallback).not.toHaveBeenCalled();
-
       vi.advanceTimersByTime(mockDuration / 2);
 
       act(() => {
-        component.update(
+        wrapper.update(
           <TimeoutComponent
             callback={mockCallback}
             duration={mockDuration}
@@ -125,26 +122,20 @@ describe('useTimeout', () => {
       });
 
       vi.advanceTimersByTime(mockDuration);
-
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
     it('will restart the timeout from the beginning when toggled back and forth', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
-      let component: ReactTestRenderer;
-
-      act(() => {
-        component = create(
-          <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
-        );
-      });
+      const wrapper = mount(
+        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+      );
 
       expect(mockCallback).not.toHaveBeenCalled();
-
       vi.advanceTimersByTime(mockDuration - 1);
 
       act(() => {
-        component.update(
+        wrapper.update(
           <TimeoutComponent
             callback={mockCallback}
             duration={mockDuration}
@@ -154,11 +145,10 @@ describe('useTimeout', () => {
       });
 
       vi.advanceTimersByTime(mockDuration);
-
       expect(mockCallback).not.toHaveBeenCalled();
 
       act(() => {
-        component.update(
+        wrapper.update(
           <TimeoutComponent
             callback={mockCallback}
             duration={mockDuration}

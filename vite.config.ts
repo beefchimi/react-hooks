@@ -14,10 +14,7 @@ const DTS_ENTRY_CONTENT = `export * from './types/index';`;
 
 const testConfig: vitestTypes.InlineConfig = {
   global: true,
-  // TODO: Using this (or JSDOM) breaks a bunch of tests with timers.
-  // Need to figure out what is causing this.
-  // https://github.com/beefchimi/react-hooks/issues/11
-  // environment: 'happy-dom',
+  environment: 'happy-dom',
 };
 
 // TODO: Do we actually need to include React DOM?

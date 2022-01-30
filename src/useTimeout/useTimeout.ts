@@ -42,7 +42,7 @@ export function useTimeout(
       timeoutRef.current = setTimeout(handleCallback, duration);
     }
 
-    // TODO: Really stupid casting required by TypeScript
+    // TODO: Unfortunate typecasting because of dual DOM/Node environment.
     return () => clearTimeout(timeoutRef.current as unknown as number);
   }, [duration, playing]);
 }

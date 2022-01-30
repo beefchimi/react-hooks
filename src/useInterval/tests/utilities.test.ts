@@ -1,3 +1,4 @@
+// @vitest-environment node
 import {getDelay} from '../utilities';
 import type {DelayFnArgs} from '../types';
 

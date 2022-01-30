@@ -1,4 +1,3 @@
-// @vitest-environment happy-dom
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 
 describe('useIsoLayoutEffect > client', () => {
