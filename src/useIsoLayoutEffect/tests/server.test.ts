@@ -1,3 +1,4 @@
+// @vitest-environment node
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 
 describe('useIsoLayoutEffect > server side', () => {
