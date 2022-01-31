@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {useTimeout} from '../useTimeout';
 import type {TimeoutCallback, TimeoutHookOptions} from '../types';
 

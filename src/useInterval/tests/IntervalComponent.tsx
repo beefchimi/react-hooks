@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {useInterval} from '../useInterval';
 import type {IntervalCallback, IntervalHookOptions} from '../types';
 
