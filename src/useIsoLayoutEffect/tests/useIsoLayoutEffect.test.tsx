@@ -1,7 +1,7 @@
 import React from 'react';
 import {act} from 'react-test-renderer';
 
-import {mount, noop} from '../../utilities';
+import {mount} from '../../utilities';
 import {IsoComponent} from './IsoComponent';
 
 // This test is somewhat useless... we don't need to test
@@ -19,7 +19,7 @@ describe('useIsoLayoutEffect', () => {
 
   describe('callback', () => {
     it('executes on mount', () => {
-      const mockCallback = vi.fn(noop);
+      const mockCallback = vi.fn();
       mount(<IsoComponent callback={mockCallback} />);
 
       vi.advanceTimersByTime(1);
@@ -27,7 +27,7 @@ describe('useIsoLayoutEffect', () => {
     });
 
     it('executes again after dependency change', () => {
-      const mockCallback = vi.fn(noop);
+      const mockCallback = vi.fn();
       const wrapper = mount(<IsoComponent callback={mockCallback} />);
 
       vi.advanceTimersByTime(1);
