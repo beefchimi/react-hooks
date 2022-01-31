@@ -1,8 +1,6 @@
-import React from 'react';
-import {act} from 'react-test-renderer';
+import {renderHook} from '@testing-library/react-hooks';
 
-import {mount} from '../../utilities';
-import {IsoComponent} from './IsoComponent';
+import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 
 // This test is somewhat useless... we don't need to test
 // that React's `useEffect()` hooks work. What these test
@@ -20,7 +18,8 @@ describe('useIsoLayoutEffect', () => {
   describe('callback', () => {
     it('executes on mount', () => {
       const mockCallback = vi.fn();
-      mount(<IsoComponent callback={mockCallback} />);
+
+      renderHook(() => useIsoLayoutEffect(mockCallback));
 
       vi.advanceTimersByTime(1);
       expect(mockCallback).toHaveBeenCalledOnce();
@@ -28,13 +27,15 @@ describe('useIsoLayoutEffect', () => {
 
     it('executes again after dependency change', () => {
       const mockCallback = vi.fn();
-      const wrapper = mount(<IsoComponent callback={mockCallback} />);
+
+      const {rerender} = renderHook(
+        ({dependency}) => useIsoLayoutEffect(mockCallback, [dependency]),
+        {initialProps: {dependency: 'foo'}},
+      );
 
       vi.advanceTimersByTime(1);
 
-      act(() => {
-        wrapper.update(<IsoComponent callback={mockCallback} dependencyProp />);
-      });
+      rerender({dependency: 'bar'});
 
       vi.advanceTimersByTime(1);
       expect(mockCallback).toHaveBeenCalledTimes(2);
