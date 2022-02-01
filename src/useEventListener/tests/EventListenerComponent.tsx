@@ -36,7 +36,7 @@ export function EventListenerComponent({
 
   return (
     <div className="EventListenerComponent">
-      <button ref={buttonRef} type="button" className="Button">
+      <button ref={buttonRef} type="button">
         Event Listener Component
       </button>
     </div>
