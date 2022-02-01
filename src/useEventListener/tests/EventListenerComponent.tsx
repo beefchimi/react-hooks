@@ -3,10 +3,9 @@ import React, {useRef} from 'react';
 import {useEventListener} from '../useEventListener';
 import type {EventListenerHookOptions} from '../types';
 
-enum AllowedEvent {
+export enum AllowedEvent {
   Click = 'click',
-  Focus = 'focus',
-  Blur = 'blur',
+  KeyPress = 'keypress',
 }
 
 export interface EventListenerComponentProps
@@ -14,11 +13,11 @@ export interface EventListenerComponentProps
     EventListenerHookOptions,
     'callback' | 'options' | 'disabled' | 'preferLayoutEffect'
   > {
-  event?: AllowedEvent;
+  eventType?: AllowedEvent;
 }
 
 export function EventListenerComponent({
-  event = AllowedEvent.Click,
+  eventType = AllowedEvent.Click,
   callback,
   options,
   disabled,
@@ -28,7 +27,7 @@ export function EventListenerComponent({
 
   useEventListener({
     target: buttonRef.current,
-    eventName: event,
+    eventType,
     callback,
     options,
     disabled,
