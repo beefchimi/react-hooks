@@ -14,7 +14,7 @@ const DTS_ENTRY_CONTENT = `export * from './types/index';`;
 
 const testConfig: vitestTypes.InlineConfig = {
   global: true,
-  environment: 'happy-dom',
+  environment: 'jsdom',
   setupFiles: './src/test/setup.ts',
 };
 
