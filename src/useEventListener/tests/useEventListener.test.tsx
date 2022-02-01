@@ -47,11 +47,12 @@ describe('useEventListener', () => {
     it('registers on the provided component', () => {
       const mockCallback = vi.fn();
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
       const {rerender} = mount(
         <EventListenerComponent callback={mockCallback} />,
       );
+
+      // TODO: Requires an immediate call to `rerender()` in order for
+      // the hook to take effect (since it relies on a `ref`).
       rerender(<EventListenerComponent callback={mockCallback} />);
 
       const button = screen.getByRole('button');
