@@ -1,9 +1,7 @@
-import React from 'react';
-import {act} from 'react-test-renderer';
 import type vitestTypes from 'vitest';
+import {renderHook} from '@testing-library/react-hooks';
 
-import {mount} from '../../utilities';
-import {TimeoutComponent} from './TimeoutComponent';
+import {useTimeout} from '../useTimeout';
 
 describe('useTimeout', () => {
   let mockTimestamp = 0;
@@ -39,11 +37,8 @@ describe('useTimeout', () => {
     it('does not execute before the timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
-      );
+      renderHook(() => useTimeout(mockCallback, {duration: mockDuration}));
 
-      expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration - 1);
       expect(mockCallback).not.toHaveBeenCalled();
     });
@@ -51,11 +46,8 @@ describe('useTimeout', () => {
     it('executes after timeout has expired', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
-      );
+      renderHook(() => useTimeout(mockCallback, {duration: mockDuration}));
 
-      expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
@@ -65,7 +57,7 @@ describe('useTimeout', () => {
     it('executes `callback` immediately by default', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(<TimeoutComponent callback={mockCallback} />);
+      renderHook(() => useTimeout(mockCallback));
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
@@ -75,7 +67,7 @@ describe('useTimeout', () => {
     it('executes `callback` immediately when `0`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(<TimeoutComponent callback={mockCallback} duration={0} />);
+      renderHook(() => useTimeout(mockCallback, {duration: 0}));
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
@@ -89,37 +81,27 @@ describe('useTimeout', () => {
     it('does not execute when `false`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <TimeoutComponent
-          callback={mockCallback}
-          duration={mockDuration}
-          playing={false}
-        />,
+      renderHook(() =>
+        useTimeout(mockCallback, {duration: mockDuration, playing: false}),
       );
 
-      expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration * 2);
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
     it('will prevent `callback` from executing when toggled before expiration', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
-      const wrapper = mount(
-        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+
+      const {rerender} = renderHook(
+        ({playing}) =>
+          useTimeout(mockCallback, {duration: mockDuration, playing}),
+        {initialProps: {playing: undefined}},
       );
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration / 2);
 
-      act(() => {
-        wrapper.update(
-          <TimeoutComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing={false}
-          />,
-        );
-      });
+      rerender({playing: false});
 
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).not.toHaveBeenCalled();
@@ -127,35 +109,20 @@ describe('useTimeout', () => {
 
     it('will restart the timeout from the beginning when toggled back and forth', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
-      const wrapper = mount(
-        <TimeoutComponent callback={mockCallback} duration={mockDuration} />,
+
+      const {rerender} = renderHook(({playing}) =>
+        useTimeout(mockCallback, {duration: mockDuration, playing}),
       );
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration - 1);
 
-      act(() => {
-        wrapper.update(
-          <TimeoutComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing={false}
-          />,
-        );
-      });
+      rerender({playing: false});
 
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).not.toHaveBeenCalled();
 
-      act(() => {
-        wrapper.update(
-          <TimeoutComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing
-          />,
-        );
-      });
+      rerender({playing: true});
 
       vi.advanceTimersByTime(mockDuration - 1);
       expect(mockCallback).not.toHaveBeenCalled();

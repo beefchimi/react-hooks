@@ -1,25 +1,64 @@
 import React from 'react';
-// import {act} from 'react-test-renderer';
-import type {ReactTestRenderer} from 'react-test-renderer';
-// import type vitestTypes from 'vitest';
+import {screen} from '@testing-library/react';
+import {renderHook} from '@testing-library/react-hooks';
+import userEvent from '@testing-library/user-event';
 
-import {mount} from '../../utilities';
+import {mount} from '../../test/utilities';
+import {useEventListener} from '../useEventListener';
 import {EventListenerComponent} from './EventListenerComponent';
 
 describe('useEventListener', () => {
   describe('target', () => {
-    // TODO: This is just a placeholder test.
+    it('does not register if element is not found', () => {
+      const mockCallback = vi.fn();
+
+      renderHook(() =>
+        useEventListener({
+          target: undefined,
+          eventName: 'keypress',
+          callback: mockCallback,
+        }),
+      );
+
+      userEvent.keyboard('foo');
+
+      // TODO: We need a way to access `listAllEventListeners()`
+      // so that we can actually check and see if something was registered.
+      // Investigate what patterns exist in the current testing stack.
+      expect(mockCallback).not.toHaveBeenCalled();
+    });
+
     it('registers on the provided element', () => {
       const mockCallback = vi.fn();
 
-      const wrapper = mount(<EventListenerComponent callback={mockCallback} />);
-      const button = getButton(wrapper);
+      renderHook(() =>
+        useEventListener({
+          target: document.body,
+          eventName: 'keypress',
+          callback: mockCallback,
+        }),
+      );
 
-      expect(mockCallback).not.toHaveBeenCalled();
-      expect(button).not.toBeNull();
+      userEvent.keyboard('foo');
+
+      expect(mockCallback).toHaveBeenCalled();
     });
 
-    it.todo('does not register if element is not found');
+    it('registers on the provided component', () => {
+      const mockCallback = vi.fn();
+
+      // TODO: Requires an immediate call to `rerender()` in order for
+      // the hook to take effect (since it relies on a `ref`).
+      const {rerender} = mount(
+        <EventListenerComponent callback={mockCallback} />,
+      );
+      rerender(<EventListenerComponent callback={mockCallback} />);
+
+      const button = screen.getByRole('button');
+      userEvent.click(button);
+
+      expect(mockCallback).toHaveBeenCalled();
+    });
 
     it.todo('removes listener when element is removed from DOM');
   });
@@ -58,7 +97,3 @@ describe('useEventListener', () => {
     it.todo('uses `useLayoutEffect` when `true`');
   });
 });
-
-function getButton(wrapper: ReactTestRenderer) {
-  return wrapper.root.findByType('button');
-}

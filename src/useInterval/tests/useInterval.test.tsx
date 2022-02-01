@@ -1,9 +1,7 @@
-import React from 'react';
-import {act} from 'react-test-renderer';
 import type vitestTypes from 'vitest';
+import {renderHook} from '@testing-library/react-hooks';
 
-import {mount} from '../../utilities';
-import {IntervalComponent} from './IntervalComponent';
+import {useInterval} from '../useInterval';
 
 describe('useInterval', () => {
   let mockTimestamp = 0;
@@ -39,11 +37,8 @@ describe('useInterval', () => {
     it('does not execute before the first interation has elapsed', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
-      );
+      renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
 
-      expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration - 1);
       expect(mockCallback).not.toHaveBeenCalled();
     });
@@ -51,13 +46,9 @@ describe('useInterval', () => {
     it('executes once after first iteration', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
-      );
+      renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
 
-      expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration);
-
       expect(mockCallback).toHaveBeenCalledOnce();
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
@@ -65,13 +56,9 @@ describe('useInterval', () => {
     it('executes multiple times after enough time has passed', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
-      );
+      renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
 
-      expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration * 3);
-
       expect(mockCallback).toHaveBeenCalledTimes(3);
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
@@ -81,7 +68,7 @@ describe('useInterval', () => {
     it('executes `callback` immediately by default', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(<IntervalComponent callback={mockCallback} />);
+      renderHook(() => useInterval(mockCallback));
 
       expect(mockCallback).not.toHaveBeenCalled();
 
@@ -96,7 +83,7 @@ describe('useInterval', () => {
     it('executes `callback` immediately when `0`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(<IntervalComponent callback={mockCallback} duration={0} />);
+      renderHook(() => useInterval(mockCallback, {duration: 0}));
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersToNextTimer();
@@ -110,37 +97,27 @@ describe('useInterval', () => {
     it('does not execute when `false`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <IntervalComponent
-          callback={mockCallback}
-          duration={mockDuration}
-          playing={false}
-        />,
+      renderHook(() =>
+        useInterval(mockCallback, {duration: mockDuration, playing: false}),
       );
 
-      expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration * 2);
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
     it('will prevent `callback` from executing when toggled before expiration', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
-      const wrapper = mount(
-        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
+
+      const {rerender} = renderHook(
+        ({playing}) =>
+          useInterval(mockCallback, {duration: mockDuration, playing}),
+        {initialProps: {playing: undefined}},
       );
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration / 2);
 
-      act(() => {
-        wrapper.update(
-          <IntervalComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing={false}
-          />,
-        );
-      });
+      rerender({playing: false});
 
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).not.toHaveBeenCalled();
@@ -148,35 +125,20 @@ describe('useInterval', () => {
 
     it('will restart the timeout from the beginning when toggled back and forth without `allowPausing`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
-      const wrapper = mount(
-        <IntervalComponent callback={mockCallback} duration={mockDuration} />,
+
+      const {rerender} = renderHook(({playing}) =>
+        useInterval(mockCallback, {duration: mockDuration, playing}),
       );
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration - 1);
 
-      act(() => {
-        wrapper.update(
-          <IntervalComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing={false}
-          />,
-        );
-      });
+      rerender({playing: false});
 
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).not.toHaveBeenCalled();
 
-      act(() => {
-        wrapper.update(
-          <IntervalComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing
-          />,
-        );
-      });
+      rerender({playing: true});
 
       vi.advanceTimersByTime(mockDuration - 1);
       expect(mockCallback).not.toHaveBeenCalled();
@@ -192,41 +154,24 @@ describe('useInterval', () => {
 
     it('will restart the timeout from the paused position when toggled back and forth', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
-      const wrapper = mount(
-        <IntervalComponent
-          callback={mockCallback}
-          duration={mockDuration}
-          allowPausing
-        />,
+
+      const {rerender} = renderHook(({playing}) =>
+        useInterval(mockCallback, {
+          duration: mockDuration,
+          allowPausing: true,
+          playing,
+        }),
       );
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(mockDuration - pauseOffset);
 
-      act(() => {
-        wrapper.update(
-          <IntervalComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing={false}
-            allowPausing
-          />,
-        );
-      });
+      rerender({playing: false});
 
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).not.toHaveBeenCalled();
 
-      act(() => {
-        wrapper.update(
-          <IntervalComponent
-            callback={mockCallback}
-            duration={mockDuration}
-            playing
-            allowPausing
-          />,
-        );
-      });
+      rerender({playing: true});
 
       vi.advanceTimersByTime(pauseOffset - 1);
       expect(mockCallback).not.toHaveBeenCalled();
@@ -242,12 +187,11 @@ describe('useInterval', () => {
     it('will fire immediately then resume execution at defined intervals', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      mount(
-        <IntervalComponent
-          callback={mockCallback}
-          duration={mockDuration}
-          skipFirstInterval
-        />,
+      renderHook(() =>
+        useInterval(mockCallback, {
+          duration: mockDuration,
+          skipFirstInterval: true,
+        }),
       );
 
       vi.advanceTimersToNextTimer();
@@ -261,6 +205,38 @@ describe('useInterval', () => {
 
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).toHaveBeenCalledTimes(3);
+    });
+
+    it('will not reset intervals if changed while mounted', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+
+      // TODO: This test does not pass if `initialProps` is `undefined`.
+      const {rerender} = renderHook(
+        ({skipFirstInterval}) =>
+          useInterval(mockCallback, {
+            duration: mockDuration,
+            skipFirstInterval,
+          }),
+        {initialProps: {skipFirstInterval: false}},
+      );
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).toHaveBeenCalledOnce();
+
+      rerender({skipFirstInterval: true});
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).toHaveBeenCalledTimes(2);
+
+      rerender({skipFirstInterval: false});
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).toHaveBeenCalledTimes(3);
+
+      rerender({skipFirstInterval: true});
+
+      vi.advanceTimersByTime(mockDuration + 10);
+      expect(mockCallback).toHaveBeenCalledTimes(4);
     });
   });
 });
