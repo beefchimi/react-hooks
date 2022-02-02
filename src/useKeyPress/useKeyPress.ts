@@ -1,6 +1,7 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useRef} from 'react';
 
 import {filterNullishValuesFromObject} from '../utilities';
+import {useEventListener} from '../useEventListener';
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 import {KeyPressEventType} from './types';
 import type {KeyPressCallback, KeyPressInput, KeyPressOptions} from './types';
@@ -39,15 +40,11 @@ export function useKeyPress(
     callbackRef.current = callback;
   }, [callback]);
 
-  // TODO: This can probably use the `useEventListener()` hook,
-  // but we likely won't be able to use a `enum` for `eventType`.
-  useEffect(() => {
-    if (!disabled && target) {
-      target.addEventListener(eventType, handleCallback);
-    }
-
-    return () => {
-      target?.removeEventListener(eventType, handleCallback);
-    };
-  }, [handleCallback, eventType, target, disabled]);
+  useEventListener({
+    eventType,
+    target,
+    disabled,
+    callback: handleCallback,
+    // options: {capture: true},
+  });
 }

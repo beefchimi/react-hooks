@@ -23,9 +23,10 @@ export function useEventListener({
     callbackRef.current = callback;
   }, [callback]);
 
+  // TODO: Does this need the `callback` as a dependency?
+  // We might need to move `handleCallback()` out of the effect
+  // and wrap with `useCallback()` if we find this to be a problem.
   usePreferredEffect(() => {
-    // TODO: This could move outside of the effect,
-    // and then this effect could use it as a dependency.
     function handleCallback(event: any) {
       callbackRef.current(event);
     }
