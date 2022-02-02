@@ -33,8 +33,8 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
+      // TODO: Requires an immediate `rerender()` for the updated ref.
+      // https://github.com/beefchimi/react-hooks/issues/20
       rerender(
         <OutsideClickComponent
           onAction={mockOnAction}
@@ -71,8 +71,8 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
+      // TODO: Requires an immediate `rerender()` for the updated ref.
+      // https://github.com/beefchimi/react-hooks/issues/20
       rerender(
         <OutsideClickComponent
           onAction={mockOnAction}
@@ -104,8 +104,8 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
+      // TODO: Requires an immediate `rerender()` for the updated ref.
+      // https://github.com/beefchimi/react-hooks/issues/20
       rerender(
         <OutsideClickComponent
           exclude
