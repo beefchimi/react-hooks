@@ -1,3 +1,3 @@
-// Global test setup can be defined here.
-// For example, if we needed to add/change the default jest matchers:
-// import '@testing-library/jest-dom';
+// In some project configurations,
+// this file may need to be referrenced from `tsconfig.json` as an `include`.
+import '@testing-library/jest-dom';
