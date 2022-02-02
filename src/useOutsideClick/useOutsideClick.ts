@@ -35,9 +35,9 @@ export function useOutsideClick(
   }, [callback, element]);
 
   useEventListener({
-    eventName: 'click',
-    target: element?.ownerDocument,
+    eventType: 'click',
     callback: memoizedCallback,
+    target: element?.ownerDocument,
     options: {
       capture: true,
     },

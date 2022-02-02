@@ -17,13 +17,9 @@ export function useTimeout(
 ): void {
   // NOTE: This wouldn't be necessary if we always require
   // `duration` to be passed (making the `options` object required).
-  const filteredOptions = options
-    ? filterNullishValuesFromObject<TimeoutHookOptions>(options)
-    : {};
-
   const {duration, playing} = {
     ...DEFAULT_OPTIONS,
-    ...filteredOptions,
+    ...filterNullishValuesFromObject<TimeoutHookOptions>(options ?? {}),
   };
 
   const callbackRef = useRef<TimeoutCallback>();

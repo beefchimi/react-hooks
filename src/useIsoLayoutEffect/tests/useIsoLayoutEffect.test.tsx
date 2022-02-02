@@ -22,7 +22,7 @@ describe('useIsoLayoutEffect', () => {
       renderHook(() => useIsoLayoutEffect(mockCallback));
 
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
     it('executes again after dependency change', () => {

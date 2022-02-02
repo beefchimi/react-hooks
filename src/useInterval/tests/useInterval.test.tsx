@@ -2,6 +2,7 @@ import type vitestTypes from 'vitest';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {useInterval} from '../useInterval';
+import type {IntervalHookOptions} from '../types';
 
 describe('useInterval', () => {
   let mockTimestamp = 0;
@@ -49,7 +50,7 @@ describe('useInterval', () => {
       renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
 
       vi.advanceTimersByTime(mockDuration);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
 
@@ -77,7 +78,7 @@ describe('useInterval', () => {
       // JS heap out of memory crash.
       vi.advanceTimersToNextTimer();
 
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
     it('executes `callback` immediately when `0`', () => {
@@ -87,7 +88,7 @@ describe('useInterval', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -109,7 +110,7 @@ describe('useInterval', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(
-        ({playing}) =>
+        ({playing}: IntervalHookOptions) =>
           useInterval(mockCallback, {duration: mockDuration, playing}),
         {initialProps: {playing: undefined}},
       );
@@ -126,7 +127,7 @@ describe('useInterval', () => {
     it('will restart the timeout from the beginning when toggled back and forth without `allowPausing`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      const {rerender} = renderHook(({playing}) =>
+      const {rerender} = renderHook(({playing}: IntervalHookOptions) =>
         useInterval(mockCallback, {duration: mockDuration, playing}),
       );
 
@@ -144,7 +145,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
 
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -155,7 +156,7 @@ describe('useInterval', () => {
     it('will restart the timeout from the paused position when toggled back and forth', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      const {rerender} = renderHook(({playing}) =>
+      const {rerender} = renderHook(({playing}: IntervalHookOptions) =>
         useInterval(mockCallback, {
           duration: mockDuration,
           allowPausing: true,
@@ -177,7 +178,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
 
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -195,7 +196,7 @@ describe('useInterval', () => {
       );
 
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
 
       vi.advanceTimersByTime(mockDuration - 1);
       expect(mockCallback).not.toHaveBeenCalledTimes(2);
@@ -221,7 +222,7 @@ describe('useInterval', () => {
       );
 
       vi.advanceTimersByTime(mockDuration);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
 
       rerender({skipFirstInterval: true});
 

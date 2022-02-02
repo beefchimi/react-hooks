@@ -2,6 +2,7 @@ import type vitestTypes from 'vitest';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {useTimeout} from '../useTimeout';
+import type {TimeoutHookOptions} from '../types';
 
 describe('useTimeout', () => {
   let mockTimestamp = 0;
@@ -61,7 +62,7 @@ describe('useTimeout', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
     it('executes `callback` immediately when `0`', () => {
@@ -71,7 +72,7 @@ describe('useTimeout', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -93,7 +94,7 @@ describe('useTimeout', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(
-        ({playing}) =>
+        ({playing}: TimeoutHookOptions) =>
           useTimeout(mockCallback, {duration: mockDuration, playing}),
         {initialProps: {playing: undefined}},
       );
@@ -110,7 +111,7 @@ describe('useTimeout', () => {
     it('will restart the timeout from the beginning when toggled back and forth', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      const {rerender} = renderHook(({playing}) =>
+      const {rerender} = renderHook(({playing}: TimeoutHookOptions) =>
         useTimeout(mockCallback, {duration: mockDuration, playing}),
       );
 
@@ -128,7 +129,7 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
 
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 });

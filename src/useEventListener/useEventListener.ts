@@ -1,13 +1,12 @@
 import {useEffect, useRef} from 'react';
 
-import {noop} from '../utilities';
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 import type {EventListenerHookOptions} from './types';
 
 export function useEventListener({
-  target,
-  eventName,
+  eventType,
   callback,
+  target,
   options = {},
   disabled = false,
   preferLayoutEffect = false,
@@ -24,19 +23,20 @@ export function useEventListener({
     callbackRef.current = callback;
   }, [callback]);
 
+  // TODO: Does this need the `callback` as a dependency?
+  // We might need to move `handleCallback()` out of the effect
+  // and wrap with `useCallback()` if we find this to be a problem.
   usePreferredEffect(() => {
-    function handler(event: any) {
+    function handleCallback(event: any) {
       callbackRef.current(event);
     }
 
-    if (!disabled && target != null) {
-      target.addEventListener(eventName, handler, options);
-
-      return () => {
-        target.removeEventListener(eventName, handler, options);
-      };
+    if (!disabled && target) {
+      target.addEventListener(eventType, handleCallback, options);
     }
 
-    return noop;
-  }, [target, eventName, disabled, capture, passive, once]);
+    return () => {
+      target?.removeEventListener(eventType, handleCallback, options);
+    };
+  }, [eventType, target, disabled, capture, passive, once]);
 }

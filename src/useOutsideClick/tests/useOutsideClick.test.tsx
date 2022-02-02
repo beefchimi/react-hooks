@@ -33,8 +33,8 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
+      // TODO: Requires an immediate `rerender()` for the updated ref.
+      // https://github.com/beefchimi/react-hooks/issues/20
       rerender(
         <OutsideClickComponent
           onAction={mockOnAction}
@@ -45,14 +45,14 @@ describe('useOutsideClick', () => {
       const button = screen.getByRole('button');
       userEvent.click(button);
 
-      expect(mockOnAction).toHaveBeenCalledOnce();
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
       expect(mockOnOutsideClick).not.toHaveBeenCalled();
 
       const outsideElement = screen.getByText(/first element/i);
       userEvent.click(outsideElement);
 
-      expect(mockOnAction).toHaveBeenCalledOnce();
-      expect(mockOnOutsideClick).toHaveBeenCalledOnce();
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
+      expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
     });
 
     it.todo('removes listener when element is removed from DOM');
@@ -71,8 +71,8 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
+      // TODO: Requires an immediate `rerender()` for the updated ref.
+      // https://github.com/beefchimi/react-hooks/issues/20
       rerender(
         <OutsideClickComponent
           onAction={mockOnAction}
@@ -83,8 +83,10 @@ describe('useOutsideClick', () => {
       const outsideElement = screen.getByText(/first element/i);
       userEvent.click(outsideElement);
 
-      // TODO: Assert against an actual MouseEvent
-      expect(mockOnOutsideClick).toHaveBeenCalledWith(expect.anything());
+      // TODO: Properly mock a `MouseEvent`.
+      expect(mockOnOutsideClick).toHaveBeenCalledWith(
+        expect.objectContaining({isTrusted: false}),
+      );
     });
   });
 
@@ -102,8 +104,8 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
+      // TODO: Requires an immediate `rerender()` for the updated ref.
+      // https://github.com/beefchimi/react-hooks/issues/20
       rerender(
         <OutsideClickComponent
           exclude

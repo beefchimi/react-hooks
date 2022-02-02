@@ -27,12 +27,7 @@ export function OutsideClickComponent({
     <div className="OutsideClickComponent">
       <p>First element</p>
 
-      <button
-        ref={buttonRef}
-        type="button"
-        className="Button"
-        onClick={onAction}
-      >
+      <button ref={buttonRef} type="button" onClick={onAction}>
         Outside Event Component
       </button>
 

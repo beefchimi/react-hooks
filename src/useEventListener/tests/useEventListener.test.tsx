@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 import {mount} from '../../test/utilities';
 import {useEventListener} from '../useEventListener';
-import {EventListenerComponent} from './EventListenerComponent';
+import {AllowedEvent, EventListenerComponent} from './EventListenerComponent';
 
 describe('useEventListener', () => {
   describe('target', () => {
@@ -15,7 +15,7 @@ describe('useEventListener', () => {
       renderHook(() =>
         useEventListener({
           target: undefined,
-          eventName: 'keypress',
+          eventType: AllowedEvent.KeyPress,
           callback: mockCallback,
         }),
       );
@@ -34,7 +34,7 @@ describe('useEventListener', () => {
       renderHook(() =>
         useEventListener({
           target: document.body,
-          eventName: 'keypress',
+          eventType: AllowedEvent.KeyPress,
           callback: mockCallback,
         }),
       );
@@ -51,8 +51,8 @@ describe('useEventListener', () => {
         <EventListenerComponent callback={mockCallback} />,
       );
 
-      // TODO: Requires an immediate call to `rerender()` in order for
-      // the hook to take effect (since it relies on a `ref`).
+      // TODO: Requires an immediate `rerender()` for the updated ref.
+      // https://github.com/beefchimi/react-hooks/issues/20
       rerender(<EventListenerComponent callback={mockCallback} />);
 
       const button = screen.getByRole('button');
@@ -64,10 +64,10 @@ describe('useEventListener', () => {
     it.todo('removes listener when element is removed from DOM');
   });
 
-  describe('eventName', () => {
+  describe('eventType', () => {
     it.todo('registers the provided event');
 
-    it.todo('removes and re-applies listener when `eventName` changes');
+    it.todo('removes and re-applies listener when `eventType` changes');
   });
 
   describe('callback', () => {

@@ -1,9 +1,9 @@
-import type {GlobalEventCallback} from '../types';
+import type {GlobalEventCallback, GlobalEventTarget} from '../types';
 
 export interface EventListenerHookOptions {
-  target: Document | Window | HTMLElement | null | undefined;
-  eventName: string;
+  eventType: string;
   callback: GlobalEventCallback;
+  target?: GlobalEventTarget;
   options?: AddEventListenerOptions;
   disabled?: boolean;
   preferLayoutEffect?: boolean;
