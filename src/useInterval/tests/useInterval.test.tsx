@@ -2,6 +2,7 @@ import type vitestTypes from 'vitest';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {useInterval} from '../useInterval';
+import type {IntervalHookOptions} from '../types';
 
 describe('useInterval', () => {
   let mockTimestamp = 0;
@@ -109,7 +110,7 @@ describe('useInterval', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(
-        ({playing}) =>
+        ({playing}: IntervalHookOptions) =>
           useInterval(mockCallback, {duration: mockDuration, playing}),
         {initialProps: {playing: undefined}},
       );
@@ -126,7 +127,7 @@ describe('useInterval', () => {
     it('will restart the timeout from the beginning when toggled back and forth without `allowPausing`', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      const {rerender} = renderHook(({playing}) =>
+      const {rerender} = renderHook(({playing}: IntervalHookOptions) =>
         useInterval(mockCallback, {duration: mockDuration, playing}),
       );
 
@@ -155,7 +156,7 @@ describe('useInterval', () => {
     it('will restart the timeout from the paused position when toggled back and forth', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
-      const {rerender} = renderHook(({playing}) =>
+      const {rerender} = renderHook(({playing}: IntervalHookOptions) =>
         useInterval(mockCallback, {
           duration: mockDuration,
           allowPausing: true,

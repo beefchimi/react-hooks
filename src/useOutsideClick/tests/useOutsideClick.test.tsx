@@ -83,8 +83,10 @@ describe('useOutsideClick', () => {
       const outsideElement = screen.getByText(/first element/i);
       userEvent.click(outsideElement);
 
-      // TODO: Assert against an actual MouseEvent
-      expect(mockOnOutsideClick).toHaveBeenCalledWith(expect.anything());
+      // TODO: Properly mock a `MouseEvent`.
+      expect(mockOnOutsideClick).toHaveBeenCalledWith(
+        expect.objectContaining({isTrusted: false}),
+      );
     });
   });
 
