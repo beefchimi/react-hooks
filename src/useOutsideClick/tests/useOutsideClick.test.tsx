@@ -45,14 +45,14 @@ describe('useOutsideClick', () => {
       const button = screen.getByRole('button');
       userEvent.click(button);
 
-      expect(mockOnAction).toHaveBeenCalledOnce();
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
       expect(mockOnOutsideClick).not.toHaveBeenCalled();
 
       const outsideElement = screen.getByText(/first element/i);
       userEvent.click(outsideElement);
 
-      expect(mockOnAction).toHaveBeenCalledOnce();
-      expect(mockOnOutsideClick).toHaveBeenCalledOnce();
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
+      expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
     });
 
     it.todo('removes listener when element is removed from DOM');

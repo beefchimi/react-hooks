@@ -50,7 +50,7 @@ describe('useInterval', () => {
       renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
 
       vi.advanceTimersByTime(mockDuration);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
 
@@ -78,7 +78,7 @@ describe('useInterval', () => {
       // JS heap out of memory crash.
       vi.advanceTimersToNextTimer();
 
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
     it('executes `callback` immediately when `0`', () => {
@@ -88,7 +88,7 @@ describe('useInterval', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -145,7 +145,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
 
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -178,7 +178,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
 
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -196,7 +196,7 @@ describe('useInterval', () => {
       );
 
       vi.advanceTimersToNextTimer();
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
 
       vi.advanceTimersByTime(mockDuration - 1);
       expect(mockCallback).not.toHaveBeenCalledTimes(2);
@@ -222,7 +222,7 @@ describe('useInterval', () => {
       );
 
       vi.advanceTimersByTime(mockDuration);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
 
       rerender({skipFirstInterval: true});
 

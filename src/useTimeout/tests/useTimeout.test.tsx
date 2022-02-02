@@ -62,7 +62,7 @@ describe('useTimeout', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
     it('executes `callback` immediately when `0`', () => {
@@ -72,7 +72,7 @@ describe('useTimeout', () => {
 
       expect(mockCallback).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -129,7 +129,7 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
 
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledOnce();
+      expect(mockCallback).toHaveBeenCalledTimes(1);
     });
   });
 });
