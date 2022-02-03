@@ -2,6 +2,7 @@ import React, {useRef, useState} from 'react';
 import type {ChangeEventHandler} from 'react';
 
 import {noop} from '../../utilities';
+import {useInstantRef} from '../../useInstantRef';
 import {useKeyPress} from '../useKeyPress';
 import {KeyPressEventType} from '../types';
 import type {KeyPressCallback, KeyPressInput} from '../types';
@@ -15,7 +16,7 @@ const LABEL_ID = 'ExampleLabel';
 const INPUT_ID = 'ExampleInput';
 
 export function KeyPressComponent({input, callback}: KeyPressComponentProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputElement, inputRef] = useInstantRef<HTMLInputElement>();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const [value, setValue] = useState('');
@@ -26,7 +27,7 @@ export function KeyPressComponent({input, callback}: KeyPressComponentProps) {
 
   useKeyPress(input, callback, {
     eventType: KeyPressEventType.Up,
-    target: inputRef.current,
+    target: inputElement,
   });
 
   // TODO: The eslint-ing for this `label + input` combo seems overboard.

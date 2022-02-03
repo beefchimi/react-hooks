@@ -46,14 +46,7 @@ describe('useEventListener', () => {
 
     it('registers on the provided component', () => {
       const mockCallback = vi.fn();
-
-      const {rerender} = mount(
-        <EventListenerComponent callback={mockCallback} />,
-      );
-
-      // TODO: Requires an immediate `rerender()` for the updated ref.
-      // https://github.com/beefchimi/react-hooks/issues/20
-      rerender(<EventListenerComponent callback={mockCallback} />);
+      mount(<EventListenerComponent callback={mockCallback} />);
 
       const button = screen.getByRole('button');
       userEvent.click(button);
