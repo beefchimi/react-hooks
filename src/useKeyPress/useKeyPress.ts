@@ -4,9 +4,13 @@ import {filterNullishValuesFromObject} from '../utilities';
 import {useEventListener} from '../useEventListener';
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 import {KeyPressEventType} from './types';
-import type {KeyPressCallback, KeyPressInput, KeyPressOptions} from './types';
+import type {
+  KeyPressCallback,
+  KeyPressInput,
+  KeyPressHookOptions,
+} from './types';
 
-const DEFAULT_OPTIONS: Required<KeyPressOptions> = {
+const DEFAULT_OPTIONS: Required<KeyPressHookOptions> = {
   eventType: KeyPressEventType.Down,
   target: document,
   disabled: false,
@@ -15,12 +19,12 @@ const DEFAULT_OPTIONS: Required<KeyPressOptions> = {
 export function useKeyPress(
   keys: KeyPressInput,
   callback: KeyPressCallback,
-  options?: KeyPressOptions,
+  options?: KeyPressHookOptions,
 ) {
   // NOTE: This wouldn't be necessary if `options` was required.
   const {eventType, target, disabled} = {
     ...DEFAULT_OPTIONS,
-    ...filterNullishValuesFromObject<KeyPressOptions>(options ?? {}),
+    ...filterNullishValuesFromObject<KeyPressHookOptions>(options ?? {}),
   };
 
   const callbackRef = useRef(callback);

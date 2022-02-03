@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import {mount} from '../../test/utilities';
 import {useKeyPress} from '../useKeyPress';
 import {KeyPressEventType} from '../types';
-import type {KeyPressInput, KeyPressOptions} from '../types';
+import type {KeyPressInput, KeyPressHookOptions} from '../types';
 import {KeyPressComponent} from './KeyPressComponent';
 
 interface KeysProps {
@@ -175,7 +175,7 @@ describe('useKeyPress', () => {
         const mockCallback = vi.fn();
 
         const {rerender} = renderHook(
-          ({disabled}: KeyPressOptions) =>
+          ({disabled}: KeyPressHookOptions) =>
             useKeyPress(mockKeys, mockCallback, {disabled}),
           {initialProps: {disabled: undefined}},
         );

@@ -13,7 +13,7 @@ export type KeyPressInput = string[];
 
 // TODO: Consider a `preferKeyCode` boolean option:
 // https://github.com/beefchimi/react-hooks/issues/24
-export interface KeyPressOptions {
+export interface KeyPressHookOptions {
   // TODO: Could consider using an array of event types:
   // https://github.com/beefchimi/react-hooks/issues/21
   eventType?: KeyPressEventType;
