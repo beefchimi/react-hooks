@@ -26,16 +26,7 @@ describe('useOutsideClick', () => {
       const mockOnAction = vi.fn();
       const mockOnOutsideClick = vi.fn();
 
-      const {rerender} = mount(
-        <OutsideClickComponent
-          onAction={mockOnAction}
-          onOutsideClick={mockOnOutsideClick}
-        />,
-      );
-
-      // TODO: Requires an immediate `rerender()` for the updated ref.
-      // https://github.com/beefchimi/react-hooks/issues/20
-      rerender(
+      mount(
         <OutsideClickComponent
           onAction={mockOnAction}
           onOutsideClick={mockOnOutsideClick}
@@ -64,16 +55,7 @@ describe('useOutsideClick', () => {
     it('executes with mouse event', () => {
       const mockOnOutsideClick = vi.fn();
 
-      const {rerender} = mount(
-        <OutsideClickComponent
-          onAction={mockOnAction}
-          onOutsideClick={mockOnOutsideClick}
-        />,
-      );
-
-      // TODO: Requires an immediate `rerender()` for the updated ref.
-      // https://github.com/beefchimi/react-hooks/issues/20
-      rerender(
+      mount(
         <OutsideClickComponent
           onAction={mockOnAction}
           onOutsideClick={mockOnOutsideClick}
@@ -96,17 +78,7 @@ describe('useOutsideClick', () => {
     it('will not trigger outside click', () => {
       const mockOnOutsideClick = vi.fn();
 
-      const {rerender} = mount(
-        <OutsideClickComponent
-          exclude
-          onAction={mockOnAction}
-          onOutsideClick={mockOnOutsideClick}
-        />,
-      );
-
-      // TODO: Requires an immediate `rerender()` for the updated ref.
-      // https://github.com/beefchimi/react-hooks/issues/20
-      rerender(
+      mount(
         <OutsideClickComponent
           exclude
           onAction={mockOnAction}

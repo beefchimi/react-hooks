@@ -144,15 +144,7 @@ describe('useKeyPress', () => {
         const mockKeys = ['a', 'b', 'c'];
         const mockCallback = vi.fn();
 
-        const {rerender} = mount(
-          <KeyPressComponent input={mockKeys} callback={mockCallback} />,
-        );
-
-        // TODO: Requires an immediate `rerender()` for the updated ref.
-        // https://github.com/beefchimi/react-hooks/issues/20
-        rerender(
-          <KeyPressComponent input={mockKeys} callback={mockCallback} />,
-        );
+        mount(<KeyPressComponent input={mockKeys} callback={mockCallback} />);
 
         const buttonElement = screen.getByRole('button');
         userEvent.type(buttonElement, 'abc');

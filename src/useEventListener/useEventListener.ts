@@ -1,6 +1,7 @@
 import {useEffect, useRef} from 'react';
 
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
+import type {GlobalEventCallback} from '../types';
 import type {EventListenerHookOptions} from './types';
 
 export function useEventListener({
@@ -27,9 +28,9 @@ export function useEventListener({
   // We might need to move `handleCallback()` out of the effect
   // and wrap with `useCallback()` if we find this to be a problem.
   usePreferredEffect(() => {
-    function handleCallback(event: any) {
+    const handleCallback: GlobalEventCallback = (event) => {
       callbackRef.current(event);
-    }
+    };
 
     if (!disabled && target) {
       target.addEventListener(eventType, handleCallback, options);

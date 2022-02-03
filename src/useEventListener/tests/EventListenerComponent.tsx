@@ -1,5 +1,6 @@
-import React, {useRef} from 'react';
+import React from 'react';
 
+import {useInstantRef} from '../../useInstantRef';
 import {useEventListener} from '../useEventListener';
 import type {EventListenerHookOptions} from '../types';
 
@@ -23,10 +24,10 @@ export function EventListenerComponent({
   disabled,
   preferLayoutEffect,
 }: EventListenerComponentProps) {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [buttonElement, buttonRef] = useInstantRef<HTMLButtonElement>();
 
   useEventListener({
-    target: buttonRef.current,
+    target: buttonElement,
     eventType,
     callback,
     options,

@@ -1,5 +1,6 @@
 import React, {useRef} from 'react';
 
+import {useInstantRef} from '../../useInstantRef';
 import {useOutsideClick} from '../useOutsideClick';
 import type {OutsideClickCallback} from '../types';
 
@@ -14,11 +15,11 @@ export function OutsideClickComponent({
   onOutsideClick,
   exclude = false,
 }: OutsideClickComponentProps) {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [buttonElement, buttonRef] = useInstantRef<HTMLButtonElement>();
   const outsideElementRef = useRef<HTMLParagraphElement>(null);
 
   useOutsideClick(
-    buttonRef.current,
+    buttonElement,
     onOutsideClick,
     exclude ? outsideElementRef.current : undefined,
   );
