@@ -39,8 +39,8 @@ describe('useOutsideClick', () => {
       expect(mockOnAction).toHaveBeenCalledTimes(1);
       expect(mockOnOutsideClick).not.toHaveBeenCalled();
 
-      const outsideElement = screen.getByText(/first element/i);
-      userEvent.click(outsideElement);
+      const firstElement = screen.getByText(/first element/i);
+      userEvent.click(firstElement);
 
       expect(mockOnAction).toHaveBeenCalledTimes(1);
       expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
@@ -62,8 +62,8 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      const outsideElement = screen.getByText(/first element/i);
-      userEvent.click(outsideElement);
+      const firstElement = screen.getByText(/first element/i);
+      userEvent.click(firstElement);
 
       // TODO: Properly mock a `MouseEvent`.
       expect(mockOnOutsideClick).toHaveBeenCalledWith(
@@ -75,7 +75,7 @@ describe('useOutsideClick', () => {
   describe('exclude', () => {
     const mockOnAction = vi.fn();
 
-    it('will not trigger outside click', () => {
+    it('will not trigger callback when click matches an excluded element', () => {
       const mockOnOutsideClick = vi.fn();
 
       mount(
@@ -86,10 +86,20 @@ describe('useOutsideClick', () => {
         />,
       );
 
-      const outsideElement = screen.getByText(/last element/i);
-      userEvent.click(outsideElement);
+      const firstElement = screen.getByText(/first element/i);
+      userEvent.click(firstElement);
 
       expect(mockOnOutsideClick).not.toHaveBeenCalled();
+
+      const lastElement = screen.getByText(/last element/i);
+      userEvent.click(lastElement);
+
+      expect(mockOnOutsideClick).not.toHaveBeenCalled();
+
+      const outsideElement = screen.getByTestId('OutsideElement');
+      userEvent.click(outsideElement);
+
+      expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
     });
   });
 });

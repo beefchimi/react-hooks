@@ -16,23 +16,32 @@ export function OutsideClickComponent({
   exclude = false,
 }: OutsideClickComponentProps) {
   const [buttonElement, buttonRef] = useInstantRef<HTMLButtonElement>();
-  const outsideElementRef = useRef<HTMLParagraphElement>(null);
+
+  const firstElementRef = useRef<HTMLHeadingElement>(null);
+  const lastElementRef = useRef<HTMLParagraphElement>(null);
 
   useOutsideClick(
     buttonElement,
     onOutsideClick,
-    exclude ? outsideElementRef.current : undefined,
+    exclude ? [firstElementRef.current, lastElementRef.current] : undefined,
   );
 
   return (
     <div className="OutsideClickComponent">
-      <p>First element</p>
+      <h1 ref={firstElementRef}>First element</h1>
 
       <button ref={buttonRef} type="button" onClick={onAction}>
         Outside Event Component
       </button>
 
-      <p ref={outsideElementRef}>Last element</p>
+      <div data-testid="OutsideElement">
+        <p>
+          This outside element is omitted from the <code>exclude</code> prop,
+          and therefor will trigger the <code>onOutsideClick()</code> callback.
+        </p>
+      </div>
+
+      <p ref={lastElementRef}>Last element</p>
     </div>
   );
 }
