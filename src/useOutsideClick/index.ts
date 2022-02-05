@@ -1,2 +1,2 @@
 export {useOutsideClick} from './useOutsideClick';
-export type {OutsideClickCallback} from './types';
+export type {OutsideClickCallback, OutsideClickExclusion} from './types';
