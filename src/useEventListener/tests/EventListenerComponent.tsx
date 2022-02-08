@@ -15,6 +15,7 @@ export interface EventListenerComponentProps
     'callback' | 'options' | 'disabled' | 'preferLayoutEffect'
   > {
   eventType?: AllowedEvent;
+  attachToDocument?: boolean;
 }
 
 export function EventListenerComponent({
@@ -23,13 +24,18 @@ export function EventListenerComponent({
   options,
   disabled,
   preferLayoutEffect,
+  attachToDocument = false,
 }: EventListenerComponentProps) {
   const [buttonElement, buttonRef] = useInstantRef<HTMLButtonElement>();
 
+  const target = attachToDocument
+    ? buttonElement?.ownerDocument
+    : buttonElement;
+
   useEventListener({
-    target: buttonElement,
     eventType,
     callback,
+    target,
     options,
     disabled,
     preferLayoutEffect,
