@@ -3,7 +3,7 @@ import {screen} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 import userEvent from '@testing-library/user-event';
 
-import {mount} from '../../test/utilities';
+import {mount} from '../../../test/utilities';
 import {useKeyPress} from '../useKeyPress';
 import {KeyPressEventType} from '../types';
 import type {KeyPressInput, KeyPressHookOptions} from '../types';
