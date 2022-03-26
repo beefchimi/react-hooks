@@ -15,7 +15,7 @@ const DTS_ENTRY_CONTENT = `export * from './types/index';`;
 const testConfig: vitestTypes.InlineConfig = {
   global: true,
   environment: 'jsdom',
-  setupFiles: './test/setup.ts',
+  setupFiles: './src/test/setup.ts',
 };
 
 // TODO: Do we actually need to include React DOM?

@@ -1,7 +1,7 @@
 import React from 'react';
 import {screen} from '@testing-library/react';
 
-import {mount} from '../../../test/utilities';
+import {mount} from '../../test/utilities';
 import {InstantRefComponent} from './InstantRefComponent';
 import {NormalRefComponent} from './NormalRefComponent';
 
