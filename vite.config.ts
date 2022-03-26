@@ -21,32 +21,7 @@ const testConfig: vitestTypes.InlineConfig = {
 // TODO: Do we actually need to include React DOM?
 export default defineConfig({
   test: testConfig,
-  plugins: [
-    pluginReact(),
-    dtsPlugin({
-      beforeWriteFile(filePath, content) {
-        return {
-          filePath: filePath.replace(
-            BUILD_PATHS.dtsPluginOutput,
-            BUILD_PATHS.dtsFixedOutput,
-          ),
-          content,
-        };
-      },
-      afterBuild() {
-        fs.promises
-          .writeFile(BUILD_PATHS.dtsEntryFile, DTS_ENTRY_CONTENT)
-          .then((_success) =>
-            // eslint-disable-next-line no-console
-            console.log('The build types have been generated.'),
-          )
-          .catch(() =>
-            // eslint-disable-next-line no-console
-            console.error('There was a problem processing the build.'),
-          );
-      },
-    }),
-  ],
+  plugins: [pluginReact(), dtsPlugin()],
   build: {
     lib: {
       entry: 'src/index.ts',
