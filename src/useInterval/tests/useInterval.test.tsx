@@ -9,7 +9,7 @@ describe('useInterval', () => {
 
   beforeEach(() => {
     const mockDate = new Date(1988, 10, 1);
-    mockTimestamp = mockDate.valueOf();
+    mockTimestamp = mockDate.getTime();
 
     vi.useFakeTimers();
     vi.setSystemTime(mockDate);
@@ -56,11 +56,12 @@ describe('useInterval', () => {
 
     it('executes multiple times after enough time has passed', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
+      const iterations = 3;
 
       renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
 
-      vi.advanceTimersByTime(mockDuration * 3);
-      expect(mockCallback).toHaveBeenCalledTimes(3);
+      vi.advanceTimersByTime(mockDuration * iterations);
+      expect(mockCallback).toHaveBeenCalledTimes(iterations);
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
   });
