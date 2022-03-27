@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {timeMeasurement} from '../utilities';
 import {useInterval} from '../useInterval';
@@ -12,15 +12,12 @@ export function useCountdown(
   timeTarget: UtcMilliseconds,
   pause = false,
 ): void {
-  const callbackRef = useRef<CountdownCallback>();
-
-  function handleCallback(timestamp: UtcMilliseconds) {
-    callbackRef.current?.(timeTarget - timestamp);
-  }
-
-  useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+  const handleCallback: CountdownCallback = useCallback(
+    (timestamp: UtcMilliseconds) => {
+      callback(timeTarget - timestamp);
+    },
+    [callback, timeTarget],
+  );
 
   // Trigger `callback` on first render and subsequent changes
   // of `timeTarget` arg. This saves us from passing
