@@ -2,7 +2,7 @@ import type vitestTypes from 'vitest';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {useInterval} from '../useInterval';
-import type {IntervalHookOptions} from '../types';
+import type {IntervalCallback, IntervalHookOptions} from '../types';
 
 describe('useInterval', () => {
   let mockTimestamp = 0;
@@ -63,6 +63,33 @@ describe('useInterval', () => {
       vi.advanceTimersByTime(mockDuration * iterations);
       expect(mockCallback).toHaveBeenCalledTimes(iterations);
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
+    });
+
+    it('seemlessly continues (does not restart) iterations when `callback` changes mid-iteration', () => {
+      const mockInitialCallback = vi.fn((timestamp) => timestamp);
+
+      const {rerender} = renderHook(
+        ({callback}: {callback: IntervalCallback}) =>
+          useInterval(callback, {duration: mockDuration}),
+        {initialProps: {callback: mockInitialCallback}},
+      );
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockInitialCallback).toHaveBeenCalledTimes(1);
+      expect(mockInitialCallback).toHaveReturnedWith(mockTimestamp);
+
+      vi.advanceTimersByTime(mockDuration - 1);
+
+      const mockReturn = 'foo';
+      const mockNewCallback = vi.fn((_timestamp) => mockReturn);
+
+      rerender({callback: mockNewCallback});
+
+      vi.advanceTimersByTime(1);
+      expect(mockInitialCallback).not.toHaveBeenCalledTimes(2);
+      expect(mockNewCallback).toHaveBeenCalledTimes(1);
+      expect(mockNewCallback).not.toHaveBeenCalledTimes(2);
+      expect(mockNewCallback).toHaveReturnedWith(mockReturn);
     });
   });
 
