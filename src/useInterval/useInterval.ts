@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef} from 'react';
 
-import {filterNullishValuesFromObject} from '../utilities';
+import {filterNullishValuesFromObject, noop} from '../utilities';
 import type {SetIntervalId, SetTimeoutId} from '../types';
 import type {
   IntervalCallback,
@@ -14,6 +14,7 @@ const DEFAULT_OPTIONS: Required<IntervalHookOptions> = {
   playing: true,
   allowPausing: false,
   skipFirstInterval: false,
+  onPause: noop,
 };
 
 export function useInterval(
@@ -22,13 +23,13 @@ export function useInterval(
 ): void {
   // NOTE: This wouldn't be necessary if we always require
   // `duration` to be passed (making the `options` object required).
-  const {duration, playing, allowPausing, skipFirstInterval} = {
+  const {duration, playing, allowPausing, skipFirstInterval, onPause} = {
     ...DEFAULT_OPTIONS,
     ...filterNullishValuesFromObject<IntervalHookOptions>(options ?? {}),
   };
 
   const initialTimeData: IntervalTimeData = {
-    // progress: 0,
+    progress: 0,
     timeRemaining: duration,
   };
 
@@ -36,22 +37,17 @@ export function useInterval(
   const intervalRef = useRef<SetIntervalId>();
   const timeoutRef = useRef<SetTimeoutId>();
 
+  const mountedRef = useRef(false);
   const firstIntervalPlayed = useRef(false);
 
   const startTime = useRef(0);
-  // const progress = useRef(initialTimeData.progress);
+  const progress = useRef(initialTimeData.progress);
   const timeRemaining = useRef(initialTimeData.timeRemaining);
 
-  /*
-  const [timeData, setTimeData] = useState<IntervalHookReturn>({
-      ...initialTimeData
-  });
-  */
-
   const resetTimeData = useCallback(() => {
-    // progress.current = initialTimeData.progress;
+    progress.current = initialTimeData.progress;
     timeRemaining.current = initialTimeData.timeRemaining;
-  }, [initialTimeData.timeRemaining]);
+  }, [initialTimeData.progress, initialTimeData.timeRemaining]);
 
   function handleCallback() {
     resetTimeData();
@@ -66,20 +62,15 @@ export function useInterval(
   // NOTE: Necessary to start using the new duration if it changes while `playing`.
   useEffect(() => {
     resetTimeData();
-    // setTimeData({ ...initialTimeData });
   }, [duration, resetTimeData]);
 
   // TODO: I am intentionally omitting `skipFirstInterval`
   // from the dependencies array, but might reconsider.
   useEffect(() => {
     if (playing) {
-      // setTimeData({ ...initialTimeData });
-
-      if (!skipFirstInterval && !firstIntervalPlayed.current) {
-        // NOTE: Need to set this right away or else the
-        // very first `pause` will not record `timeRemaining`.
-        startTime.current = Date.now();
-      }
+      // NOTE: Need to set this right away or else the
+      // very first `pause` will not record `timeRemaining`.
+      startTime.current = Date.now();
 
       const delay = getDelay({
         duration,
@@ -104,15 +95,8 @@ export function useInterval(
     if (!playing && startTime.current && duration) {
       const timeDiff = Date.now() - startTime.current;
 
-      // progress.current = (timeDiff / duration) * 100;
+      progress.current = (timeDiff / duration) * 100;
       timeRemaining.current = duration - timeDiff;
-
-      /*
-      setTimeData({
-          progress: progress.current,
-          timeRemaining: timeRemaining.current
-      });
-      */
     }
 
     return () => {
@@ -123,8 +107,21 @@ export function useInterval(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration, playing, allowPausing]);
 
-  // TODO: Storing state in this hook is controversial,
-  // but if we want to support "progress between intervals",
-  // we will need to utilize useState();
-  // return timeData;
+  useEffect(() => {
+    if (!playing && mountedRef.current) {
+      onPause({
+        progress: progress.current,
+        timeRemaining: timeRemaining.current,
+      });
+    }
+  }, [playing, onPause]);
+
+  useEffect(() => {
+    // TODO: This should be replaced with a `useMountedRef()` hook.
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 }

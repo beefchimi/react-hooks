@@ -86,10 +86,12 @@ describe('useInterval', () => {
       rerender({callback: mockNewCallback});
 
       vi.advanceTimersByTime(1);
-      expect(mockInitialCallback).not.toHaveBeenCalledTimes(2);
+
       expect(mockNewCallback).toHaveBeenCalledTimes(1);
-      expect(mockNewCallback).not.toHaveBeenCalledTimes(2);
       expect(mockNewCallback).toHaveReturnedWith(mockReturn);
+
+      expect(mockInitialCallback).not.toHaveBeenCalledTimes(2);
+      expect(mockNewCallback).not.toHaveBeenCalledTimes(2);
     });
   });
 
@@ -234,6 +236,7 @@ describe('useInterval', () => {
 
       vi.advanceTimersByTime(mockDuration);
       expect(mockCallback).toHaveBeenCalledTimes(3);
+      expect(mockCallback).not.toHaveBeenCalledTimes(4);
     });
 
     it('will not reset intervals if changed while mounted', () => {
@@ -266,6 +269,152 @@ describe('useInterval', () => {
 
       vi.advanceTimersByTime(mockDuration + 10);
       expect(mockCallback).toHaveBeenCalledTimes(4);
+      expect(mockCallback).not.toHaveBeenCalledTimes(5);
+    });
+  });
+
+  describe('onPause', () => {
+    const mockDuration = 100;
+
+    it('does not execute when `playing`', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+      const mockOnPause = vi.fn((timeData) => timeData);
+
+      renderHook(() =>
+        useInterval(mockCallback, {
+          duration: mockDuration,
+          onPause: mockOnPause,
+        }),
+      );
+
+      vi.advanceTimersByTime(mockDuration * 2);
+      expect(mockOnPause).not.toHaveBeenCalled();
+    });
+
+    it('does not execute immediately if hook is initialized with `!playing`', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+      const mockOnPause = vi.fn((timeData) => timeData);
+
+      renderHook(() =>
+        useInterval(mockCallback, {
+          duration: mockDuration,
+          playing: false,
+          onPause: mockOnPause,
+        }),
+      );
+
+      vi.advanceTimersByTime(mockDuration * 2);
+      expect(mockOnPause).not.toHaveBeenCalled();
+    });
+
+    it('executes with `timeData` when `playing` is toggled to `false`', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+      const mockOnPause = vi.fn((timeData) => timeData);
+
+      const {rerender} = renderHook(
+        ({playing}: IntervalHookOptions) =>
+          useInterval(mockCallback, {
+            duration: mockDuration,
+            onPause: mockOnPause,
+            playing,
+          }),
+        {initialProps: {playing: true}},
+      );
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).toHaveBeenCalledTimes(1);
+      expect(mockOnPause).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(mockDuration / 2);
+
+      rerender({playing: false});
+
+      expect(mockOnPause).toHaveBeenCalledTimes(1);
+      expect(mockOnPause).toHaveBeenCalledWith({
+        progress: 50,
+        timeRemaining: mockDuration / 2,
+      });
+
+      rerender({playing: true});
+
+      vi.advanceTimersByTime(mockDuration - 1);
+      expect(mockOnPause).not.toHaveBeenCalledTimes(2);
+
+      rerender({playing: false});
+      expect(mockOnPause).toHaveBeenCalledTimes(2);
+      expect(mockOnPause).toHaveBeenCalledWith({
+        progress: 99,
+        timeRemaining: 1,
+      });
+
+      rerender({playing: true});
+
+      vi.advanceTimersByTime(mockDuration * 2 + 10);
+
+      rerender({playing: false});
+
+      expect(mockCallback).toHaveBeenCalledTimes(3);
+      expect(mockOnPause).toHaveBeenCalledTimes(3);
+      expect(mockOnPause).toHaveBeenCalledWith({
+        progress: 10,
+        timeRemaining: mockDuration - 10,
+      });
+    });
+
+    it('continues along timeline when `allowPausing`', () => {
+      const mockCallback = vi.fn((timestamp) => timestamp);
+      const mockOnPause = vi.fn((timeData) => timeData);
+
+      const {rerender} = renderHook(
+        ({playing}: IntervalHookOptions) =>
+          useInterval(mockCallback, {
+            duration: mockDuration,
+            onPause: mockOnPause,
+            allowPausing: true,
+            playing,
+          }),
+        {initialProps: {playing: true}},
+      );
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).toHaveBeenCalledTimes(1);
+      expect(mockOnPause).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(20);
+
+      rerender({playing: false});
+
+      expect(mockOnPause).toHaveBeenCalledTimes(1);
+      expect(mockOnPause).toHaveBeenCalledWith({
+        progress: 20,
+        timeRemaining: 80,
+      });
+
+      rerender({playing: true});
+
+      vi.advanceTimersByTime(mockDuration - 20);
+      expect(mockCallback).toHaveBeenCalledTimes(2);
+      expect(mockOnPause).not.toHaveBeenCalledTimes(2);
+
+      rerender({playing: false});
+      expect(mockOnPause).toHaveBeenCalledTimes(2);
+      expect(mockOnPause).toHaveBeenCalledWith({
+        progress: 0,
+        timeRemaining: mockDuration,
+      });
+
+      rerender({playing: true});
+
+      vi.advanceTimersByTime(mockDuration * 2 + 10);
+
+      rerender({playing: false});
+
+      expect(mockCallback).toHaveBeenCalledTimes(4);
+      expect(mockOnPause).toHaveBeenCalledTimes(3);
+      expect(mockOnPause).toHaveBeenCalledWith({
+        progress: 10,
+        timeRemaining: mockDuration - 10,
+      });
     });
   });
 });
