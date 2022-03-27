@@ -5,5 +5,7 @@ export interface BasicObject {
 export type GlobalEventCallback = (event: any) => void;
 export type GlobalEventTarget = Document | Window | HTMLElement | null;
 
+export type UtcMilliseconds = number;
+
 export type SetIntervalId = number | ReturnType<typeof setInterval>;
 export type SetTimeoutId = number | ReturnType<typeof setTimeout>;

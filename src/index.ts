@@ -1,5 +1,6 @@
 export type {SetIntervalId, SetTimeoutId} from './types';
 
+export * from './useCountdown';
 export * from './useEventListener';
 export * from './useInstantRef';
 export * from './useInterval';

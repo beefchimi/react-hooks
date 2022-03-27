@@ -1,6 +1,8 @@
+import type {UtcMilliseconds} from '../types';
+
 // TODO: Consider supporting setInterval paramaters.
 // TODO: Maybe `any` instead of `void` (or use generic)?
-export type IntervalCallback = (timestamp: number) => void;
+export type IntervalCallback = (timestamp: UtcMilliseconds) => void;
 
 export interface IntervalHookOptions {
   duration?: number;

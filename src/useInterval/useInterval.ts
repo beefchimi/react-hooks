@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useRef} from 'react';
 
+import {filterNullishValuesFromObject} from '../utilities';
 import type {SetIntervalId, SetTimeoutId} from '../types';
 import type {
   IntervalCallback,
@@ -19,9 +20,11 @@ export function useInterval(
   callback: IntervalCallback,
   options?: IntervalHookOptions,
 ): void {
+  // NOTE: This wouldn't be necessary if we always require
+  // `duration` to be passed (making the `options` object required).
   const {duration, playing, allowPausing, skipFirstInterval} = {
     ...DEFAULT_OPTIONS,
-    ...options,
+    ...filterNullishValuesFromObject<IntervalHookOptions>(options ?? {}),
   };
 
   const initialTimeData: IntervalTimeData = {

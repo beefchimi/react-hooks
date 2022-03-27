@@ -2,14 +2,14 @@ import type vitestTypes from 'vitest';
 import {renderHook} from '@testing-library/react-hooks';
 
 import {useInterval} from '../useInterval';
-import type {IntervalHookOptions} from '../types';
+import type {IntervalCallback, IntervalHookOptions} from '../types';
 
 describe('useInterval', () => {
   let mockTimestamp = 0;
 
   beforeEach(() => {
     const mockDate = new Date(1988, 10, 1);
-    mockTimestamp = mockDate.valueOf();
+    mockTimestamp = mockDate.getTime();
 
     vi.useFakeTimers();
     vi.setSystemTime(mockDate);
@@ -56,12 +56,40 @@ describe('useInterval', () => {
 
     it('executes multiple times after enough time has passed', () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
+      const iterations = 3;
 
       renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
 
-      vi.advanceTimersByTime(mockDuration * 3);
-      expect(mockCallback).toHaveBeenCalledTimes(3);
+      vi.advanceTimersByTime(mockDuration * iterations);
+      expect(mockCallback).toHaveBeenCalledTimes(iterations);
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
+    });
+
+    it('seemlessly continues (does not restart) iterations when `callback` changes mid-iteration', () => {
+      const mockInitialCallback = vi.fn((timestamp) => timestamp);
+
+      const {rerender} = renderHook(
+        ({callback}: {callback: IntervalCallback}) =>
+          useInterval(callback, {duration: mockDuration}),
+        {initialProps: {callback: mockInitialCallback}},
+      );
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockInitialCallback).toHaveBeenCalledTimes(1);
+      expect(mockInitialCallback).toHaveReturnedWith(mockTimestamp);
+
+      vi.advanceTimersByTime(mockDuration - 1);
+
+      const mockReturn = 'foo';
+      const mockNewCallback = vi.fn((_timestamp) => mockReturn);
+
+      rerender({callback: mockNewCallback});
+
+      vi.advanceTimersByTime(1);
+      expect(mockInitialCallback).not.toHaveBeenCalledTimes(2);
+      expect(mockNewCallback).toHaveBeenCalledTimes(1);
+      expect(mockNewCallback).not.toHaveBeenCalledTimes(2);
+      expect(mockNewCallback).toHaveReturnedWith(mockReturn);
     });
   });
 

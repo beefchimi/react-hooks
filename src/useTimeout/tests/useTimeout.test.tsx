@@ -9,7 +9,7 @@ describe('useTimeout', () => {
 
   beforeEach(() => {
     const mockDate = new Date(1988, 10, 1);
-    mockTimestamp = mockDate.valueOf();
+    mockTimestamp = mockDate.getTime();
 
     vi.useFakeTimers();
     vi.setSystemTime(mockDate);
