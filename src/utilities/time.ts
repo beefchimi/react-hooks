@@ -1,4 +1,12 @@
 import type {UtcMilliseconds} from '../types';
+import {flipNumberSign} from './numbers';
+
+export interface Time24HourBreakdown {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
 
 const hrsPerDay = 24;
 
@@ -27,15 +35,34 @@ export const timeMeasurement = {
   msPerDay,
 };
 
-export function msToTime(ms: UtcMilliseconds) {
-  const seconds = Math.floor(ms / msPerSec);
-  const minutes = Math.floor(seconds / secsPerMin);
-  const hours = Math.floor(minutes / minsPerHr);
-
+export function flipTimeSign({
+  days,
+  hours,
+  minutes,
+  seconds,
+}: Time24HourBreakdown) {
   return {
-    days: Math.floor(hours / hrsPerDay),
-    hours: hours % hrsPerDay,
-    minutes: minutes % minsPerHr,
-    seconds: seconds % secsPerMin,
+    days: flipNumberSign(days),
+    hours: flipNumberSign(hours),
+    minutes: flipNumberSign(minutes),
+    seconds: flipNumberSign(seconds),
   };
+}
+
+export function msToTime(ms: UtcMilliseconds): Time24HourBreakdown {
+  const isNegative = Math.sign(ms) === -1;
+  const forcedPositiveMs = Math.abs(ms);
+
+  const totalSeconds = Math.floor(forcedPositiveMs / msPerSec);
+  const totalMinutes = Math.floor(totalSeconds / secsPerMin);
+  const totalHours = Math.floor(totalMinutes / minsPerHr);
+
+  const time = {
+    days: Math.floor(totalHours / hrsPerDay),
+    hours: totalHours % hrsPerDay,
+    minutes: totalMinutes % minsPerHr,
+    seconds: totalSeconds % secsPerMin,
+  };
+
+  return isNegative ? flipTimeSign(time) : time;
 }

@@ -3,6 +3,10 @@ export interface LeftPadNumberOptions {
   prefix?: string;
 }
 
+export function flipNumberSign(value: number) {
+  return value ? -value : value;
+}
+
 export function leftPadNumber(
   value: number,
   options: LeftPadNumberOptions = {},
