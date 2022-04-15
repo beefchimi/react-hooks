@@ -1,5 +1,3 @@
-export type {SetIntervalId, SetTimeoutId} from './types';
-
 export * from './useCountdown';
 export * from './useEventListener';
 export * from './useInstantRef';
@@ -8,3 +6,6 @@ export * from './useIsoLayoutEffect';
 export * from './useKeyPress';
 export * from './useOutsideClick';
 export * from './useTimeout';
+
+export * from './types';
+export * from './utilities';

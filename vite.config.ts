@@ -1,19 +1,10 @@
-import fs from 'fs';
 import {defineConfig} from 'vite';
 import pluginReact from '@vitejs/plugin-react';
 import dtsPlugin from 'vite-plugin-dts';
 import type vitestTypes from 'vitest';
 
-const BUILD_PATHS = {
-  dtsPluginOutput: '/dist/src/',
-  dtsFixedOutput: '/dist/types/',
-  dtsEntryFile: './dist/index.d.ts',
-};
-
-const DTS_ENTRY_CONTENT = `export * from './types/index';`;
-
 const testConfig: vitestTypes.InlineConfig = {
-  global: true,
+  globals: true,
   environment: 'jsdom',
   setupFiles: './src/test/setup.ts',
 };

@@ -3,13 +3,14 @@ import {screen} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 import userEvent from '@testing-library/user-event';
 
-import {mount} from '../../test/utilities';
+import {mountWithUser} from '../../test/utilities';
 import {useEventListener} from '../useEventListener';
 import {AllowedEvent, EventListenerComponent} from './EventListenerComponent';
 
 describe('useEventListener', () => {
   describe('target', () => {
-    it('does not register if element is not found', () => {
+    it('does not register if element is not found', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       renderHook(() =>
@@ -20,7 +21,7 @@ describe('useEventListener', () => {
         }),
       );
 
-      userEvent.keyboard('foo');
+      await user.keyboard('foo');
 
       // TODO: We need a way to access `listAllEventListeners()`
       // so that we can actually check and see if something was registered.
@@ -28,7 +29,8 @@ describe('useEventListener', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('registers on the provided element', () => {
+    it('registers on the provided element', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       renderHook(() =>
@@ -39,24 +41,27 @@ describe('useEventListener', () => {
         }),
       );
 
-      userEvent.keyboard('foo');
+      await user.keyboard('foo');
 
       // TODO: Test against what element the callback originated from.
       expect(mockCallback).toHaveBeenCalled();
     });
 
-    it('registers on the provided component', () => {
+    it('registers on the provided component', async () => {
       const mockCallback = vi.fn();
-      mount(<EventListenerComponent callback={mockCallback} />);
+      const {user} = mountWithUser(
+        <EventListenerComponent callback={mockCallback} />,
+      );
 
       const button = screen.getByRole('button');
-      userEvent.click(button);
+      await user.click(button);
 
       // TODO: Test against what element the callback originated from.
       expect(mockCallback).toHaveBeenCalled();
     });
 
-    it('removes listener when unmounted', () => {
+    it('removes listener when unmounted', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       const {unmount} = renderHook(() =>
@@ -69,35 +74,36 @@ describe('useEventListener', () => {
 
       unmount();
 
-      userEvent.keyboard('foo');
+      await user.keyboard('foo');
 
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('removes listener when `target` changes', () => {
+    it('removes listener when `target` changes', async () => {
       const mockCallback = vi.fn();
 
-      const {rerender} = mount(
+      const {user, rerender} = mountWithUser(
         <EventListenerComponent callback={mockCallback} attachToDocument />,
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).toHaveBeenCalledTimes(1);
 
       rerender(<EventListenerComponent callback={mockCallback} />);
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).not.toHaveBeenCalledTimes(2);
 
       const button = screen.getByRole('button');
-      userEvent.click(button);
+      await user.click(button);
 
       expect(mockCallback).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('eventType', () => {
-    it('registers the provided event', () => {
+    it('registers the provided event', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       renderHook(() =>
@@ -108,12 +114,13 @@ describe('useEventListener', () => {
         }),
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
 
       expect(mockCallback).toHaveBeenCalled();
     });
 
-    it('removes and re-applies listener when `eventType` changes', () => {
+    it('removes and re-applies listener when `eventType` changes', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       const {rerender} = renderHook(
@@ -126,21 +133,22 @@ describe('useEventListener', () => {
         {initialProps: {eventType: AllowedEvent.Click}},
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).toHaveBeenCalledTimes(1);
 
       rerender({eventType: AllowedEvent.KeyPress});
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).not.toHaveBeenCalledTimes(2);
 
-      userEvent.keyboard('1');
+      await user.keyboard('1');
       expect(mockCallback).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('callback', () => {
-    it('is passed the event object', () => {
+    it('is passed the event object', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       renderHook(() =>
@@ -151,7 +159,7 @@ describe('useEventListener', () => {
         }),
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
 
       // TODO: Properly mock a `MouseEvent`.
       expect(mockCallback).toHaveBeenCalledWith(
@@ -159,7 +167,8 @@ describe('useEventListener', () => {
       );
     });
 
-    it('removes and re-applies listener when `callback` changes', () => {
+    it('removes and re-applies listener when `callback` changes', async () => {
+      const user = userEvent.setup();
       const mockCallbackFirst = vi.fn();
       const mockCallbackSecond = vi.fn();
 
@@ -177,13 +186,13 @@ describe('useEventListener', () => {
         },
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallbackFirst).toHaveBeenCalledTimes(1);
       expect(mockCallbackSecond).not.toHaveBeenCalled();
 
       rerender({callback: mockCallbackSecond});
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallbackFirst).not.toHaveBeenCalledTimes(2);
       expect(mockCallbackSecond).toHaveBeenCalledTimes(1);
     });
@@ -196,7 +205,8 @@ describe('useEventListener', () => {
       once: true,
     };
 
-    it('registers listener with the provided `options`', () => {
+    it('registers listener with the provided `options`', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       renderHook(() =>
@@ -208,13 +218,14 @@ describe('useEventListener', () => {
         }),
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
 
       // TODO: Figure out how to inspect the registered listener for options.
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    it('removes and re-applies listener when an individual option changes', () => {
+    it('removes and re-applies listener when an individual option changes', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       const {rerender} = renderHook(
@@ -232,22 +243,23 @@ describe('useEventListener', () => {
         },
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).toHaveBeenCalledTimes(1);
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).not.toHaveBeenCalledTimes(2);
 
       rerender({options: {...mockOptions, once: false}});
 
-      userEvent.click(document.body);
-      userEvent.click(document.body);
+      await user.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).toHaveBeenCalledTimes(3);
     });
   });
 
   describe('disabled', () => {
-    it('does not register when `true`', () => {
+    it('does not register when `true`', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       const {rerender} = renderHook(
@@ -265,17 +277,17 @@ describe('useEventListener', () => {
         },
       );
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).not.toHaveBeenCalled();
 
       rerender({disabled: false});
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).toHaveBeenCalledTimes(1);
 
       rerender({disabled: true});
 
-      userEvent.click(document.body);
+      await user.click(document.body);
       expect(mockCallback).not.toHaveBeenCalledTimes(2);
     });
   });
