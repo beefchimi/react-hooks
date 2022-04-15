@@ -1,6 +1,23 @@
-import {leftPadNumber} from '../numbers';
+import {flipNumberSign, leftPadNumber} from '../numbers';
 
 describe('Number utilities', () => {
+  describe('flipNumberSign', () => {
+    it('flips positive to negative value', () => {
+      const negativeResult = flipNumberSign(1);
+      expect(negativeResult).toBe(-1);
+    });
+
+    it('flips negative to positive value', () => {
+      const positiveResult = flipNumberSign(-1);
+      expect(positiveResult).toBe(1);
+    });
+
+    it('does not flip `0` value', () => {
+      const zeroResult = flipNumberSign(0);
+      expect(zeroResult).toBe(0);
+    });
+  });
+
   describe('leftPadNumber', () => {
     describe('default options', () => {
       it('returns a string with a single leading `0` when passed a single-digit value', () => {

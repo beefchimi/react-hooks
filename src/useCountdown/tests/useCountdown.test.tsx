@@ -4,6 +4,7 @@ import {timeMeasurement} from '../../utilities';
 import type {UtcMilliseconds} from '../../types';
 
 import {useCountdown} from '../useCountdown';
+import type {CountdownCallback} from '../types';
 
 const MOCK_DATE_ARGS = [1988, 10, 1];
 const MOCK_DATE_24H_LATER = MOCK_DATE_ARGS[2] + 1;
@@ -73,6 +74,40 @@ describe('useCountdown', () => {
       // run at 1 second intervals.
       expect(mockCallback).toHaveBeenCalledTimes(iterations + 1);
     });
+
+    it('seemlessly continues (does not restart) iterations when `callback` changes mid-iteration', () => {
+      let recordedDifference = 0;
+      const mockInitialCallback = vi.fn((difference) => {
+        recordedDifference = difference;
+        return difference;
+      });
+
+      const {rerender} = renderHook(
+        ({callback}: {callback: CountdownCallback}) =>
+          useCountdown(callback, mockTimeStart),
+        {initialProps: {callback: mockInitialCallback}},
+      );
+
+      vi.advanceTimersByTime(oneSecond);
+      expect(mockInitialCallback).toHaveBeenCalledTimes(2);
+      expect(mockInitialCallback).toHaveReturnedWith(recordedDifference);
+      expect(recordedDifference).toBe(-oneSecond);
+
+      vi.advanceTimersByTime(oneSecond - 1);
+
+      const mockReturn = 'foo';
+      const mockNewCallback = vi.fn((_difference) => mockReturn);
+
+      rerender({callback: mockNewCallback});
+
+      vi.advanceTimersByTime(1);
+
+      expect(mockNewCallback).toHaveBeenCalledTimes(1);
+      expect(mockNewCallback).toHaveReturnedWith(mockReturn);
+
+      expect(mockInitialCallback).not.toHaveBeenCalledTimes(3);
+      expect(mockNewCallback).not.toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('timeTarget', () => {
@@ -90,19 +125,19 @@ describe('useCountdown', () => {
       renderHook(() => useCountdown(mockCallback, mockTimeStart));
 
       vi.advanceTimersByTime(oneSecond);
-      expect(mockCallback).toHaveBeenCalledWith(-Math.abs(oneSecond));
+      expect(mockCallback).toHaveBeenCalledWith(-oneSecond);
 
       vi.advanceTimersByTime(oneSecond);
-      expect(mockCallback).toHaveBeenCalledWith(-Math.abs(twoSeconds));
+      expect(mockCallback).toHaveBeenCalledWith(-twoSeconds);
 
       vi.advanceTimersByTime(oneSecond);
-      expect(mockCallback).toHaveBeenCalledWith(-Math.abs(threeSeconds));
+      expect(mockCallback).toHaveBeenCalledWith(-threeSeconds);
 
       vi.advanceTimersByTime(oneSecond - 1);
-      expect(mockCallback).not.toHaveBeenCalledWith(-Math.abs(fourSeconds));
+      expect(mockCallback).not.toHaveBeenCalledWith(-fourSeconds);
 
       vi.advanceTimersByTime(1);
-      expect(mockCallback).toHaveBeenCalledWith(-Math.abs(fourSeconds));
+      expect(mockCallback).toHaveBeenCalledWith(-fourSeconds);
     });
 
     it('will produce a result reduced by 1 second per interval', () => {
@@ -152,7 +187,7 @@ describe('useCountdown', () => {
       expect(mockCallback).toHaveBeenCalledWith(0);
 
       vi.advanceTimersByTime(oneSecond);
-      expect(mockCallback).toHaveBeenCalledWith(-Math.abs(oneSecond));
+      expect(mockCallback).toHaveBeenCalledWith(-oneSecond);
 
       expect(mockCallback).toHaveBeenCalledTimes(4);
       expect(mockCallback).not.toHaveBeenCalledTimes(5);
@@ -179,7 +214,7 @@ describe('useCountdown', () => {
       expect(mockCallback).toHaveBeenCalledWith(0);
 
       vi.advanceTimersByTime(halfSecond);
-      expect(mockCallback).toHaveBeenCalledWith(-Math.abs(halfSecond));
+      expect(mockCallback).toHaveBeenCalledWith(-halfSecond);
 
       vi.advanceTimersByTime(oneSecond);
       expect(mockCallback).toHaveBeenCalledWith(

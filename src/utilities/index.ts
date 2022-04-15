@@ -1,5 +1,10 @@
 export {canUseDom} from './dom';
 export {noop} from './noop';
-export {leftPadNumber} from './numbers';
+
+export {flipNumberSign, leftPadNumber} from './numbers';
+export type {LeftPadNumberOptions} from './numbers';
+
 export {filterNullishValuesFromObject} from './objects';
-export {timeMeasurement, msToTime} from './time';
+
+export {timeMeasurement, flipTimeSign, msToTime} from './time';
+export type {Time24HourBreakdown} from './time';
