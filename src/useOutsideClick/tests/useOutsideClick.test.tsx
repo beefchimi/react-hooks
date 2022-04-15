@@ -3,18 +3,19 @@ import {screen} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 import userEvent from '@testing-library/user-event';
 
-import {mount} from '../../test/utilities';
+import {mountWithUser} from '../../test/utilities';
 import {useOutsideClick} from '../useOutsideClick';
 import {OutsideClickComponent} from './OutsideClickComponent';
 
 describe('useOutsideClick', () => {
   describe('element', () => {
-    it('does not register if element is not found', () => {
+    it('does not register if element is not found', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       renderHook(() => useOutsideClick(null, mockCallback));
 
-      userEvent.click(document.body);
+      await user.click(document.body);
 
       // TODO: We need a way to access `listAllEventListeners()`
       // so that we can actually check and see if something was registered.
@@ -22,11 +23,11 @@ describe('useOutsideClick', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('registers on the provided component', () => {
+    it('registers on the provided component', async () => {
       const mockOnAction = vi.fn();
       const mockOnOutsideClick = vi.fn();
 
-      mount(
+      const {user} = mountWithUser(
         <OutsideClickComponent
           onAction={mockOnAction}
           onOutsideClick={mockOnOutsideClick}
@@ -34,13 +35,13 @@ describe('useOutsideClick', () => {
       );
 
       const button = screen.getByRole('button');
-      userEvent.click(button);
+      await user.click(button);
 
       expect(mockOnAction).toHaveBeenCalledTimes(1);
       expect(mockOnOutsideClick).not.toHaveBeenCalled();
 
       const firstElement = screen.getByText(/first element/i);
-      userEvent.click(firstElement);
+      await user.click(firstElement);
 
       expect(mockOnAction).toHaveBeenCalledTimes(1);
       expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
@@ -52,10 +53,10 @@ describe('useOutsideClick', () => {
   describe('callback', () => {
     const mockOnAction = vi.fn();
 
-    it('executes with mouse event', () => {
+    it('executes with mouse event', async () => {
       const mockOnOutsideClick = vi.fn();
 
-      mount(
+      const {user} = mountWithUser(
         <OutsideClickComponent
           onAction={mockOnAction}
           onOutsideClick={mockOnOutsideClick}
@@ -63,7 +64,7 @@ describe('useOutsideClick', () => {
       );
 
       const firstElement = screen.getByText(/first element/i);
-      userEvent.click(firstElement);
+      await user.click(firstElement);
 
       // TODO: Properly mock a `MouseEvent`.
       expect(mockOnOutsideClick).toHaveBeenCalledWith(
@@ -75,10 +76,10 @@ describe('useOutsideClick', () => {
   describe('exclude', () => {
     const mockOnAction = vi.fn();
 
-    it('will not trigger callback when click matches an excluded element', () => {
+    it('will not trigger callback when click matches an excluded element', async () => {
       const mockOnOutsideClick = vi.fn();
 
-      mount(
+      const {user} = mountWithUser(
         <OutsideClickComponent
           exclude
           onAction={mockOnAction}
@@ -87,17 +88,17 @@ describe('useOutsideClick', () => {
       );
 
       const firstElement = screen.getByText(/first element/i);
-      userEvent.click(firstElement);
+      await user.click(firstElement);
 
       expect(mockOnOutsideClick).not.toHaveBeenCalled();
 
       const lastElement = screen.getByText(/last element/i);
-      userEvent.click(lastElement);
+      await user.click(lastElement);
 
       expect(mockOnOutsideClick).not.toHaveBeenCalled();
 
       const outsideElement = screen.getByTestId('OutsideElement');
-      userEvent.click(outsideElement);
+      await user.click(outsideElement);
 
       expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
     });

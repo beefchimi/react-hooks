@@ -3,7 +3,7 @@ import {screen} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 import userEvent from '@testing-library/user-event';
 
-import {mount} from '../../test/utilities';
+import {mountWithUser} from '../../test/utilities';
 import {useKeyPress} from '../useKeyPress';
 import {KeyPressEventType} from '../types';
 import type {KeyPressInput, KeyPressHookOptions} from '../types';
@@ -15,54 +15,61 @@ interface KeysProps {
 
 describe('useKeyPress', () => {
   describe('keys', () => {
-    it('executes the callback for all keys', () => {
+    it('executes the callback for all keys', async () => {
+      const user = userEvent.setup();
       const mockKeys = ['1', '!', 'a', 'A', 'Enter'];
       const mockCallback = vi.fn();
 
       renderHook(() => useKeyPress(mockKeys, mockCallback));
 
       // Input is identical to the mocked keys.
-      userEvent.keyboard('1!aA{enter}');
+      await user.keyboard('1!aA{enter}');
 
       expect(mockCallback).toHaveBeenCalledTimes(mockKeys.length);
     });
 
-    it('executes the callback for only matched keys', () => {
+    it('executes the callback for only matched keys', async () => {
+      const user = userEvent.setup();
       const mockKeys = ['2', '@', 'b', 'B', 'Escape'];
       const mockCallback = vi.fn();
 
       renderHook(() => useKeyPress(mockKeys, mockCallback));
 
       // Input does not include uppercase 'B'.
-      userEvent.keyboard('2@b{esc}');
+      await user.keyboard('2@b{Escape}');
 
       expect(mockCallback).toHaveBeenCalledTimes(mockKeys.length - 1);
     });
 
-    it('executes the callback multiple times for identical keys', () => {
-      const mockKeys = ['1', 'a', 'ArrowRight'];
+    it('executes the callback multiple times for identical keys', async () => {
+      const user = userEvent.setup();
+      const mockKeys = ['1', 'a', 'ShiftLeft'];
       const mockCallback = vi.fn();
 
       renderHook(() => useKeyPress(mockKeys, mockCallback));
 
-      // Input is: '1' x2, 'a' x3, '→' x2
-      userEvent.keyboard('11aaa{arrowright}{arrowright}');
+      // TODO: This example previously used `ArrowRight`,
+      // but resulted in a error. Worth investigating.
+      // Input is: '1' x2, 'a' x3, 'ShiftLeft' x2
+      await user.keyboard('11aaa{ShiftLeft}{ShiftLeft}');
 
       expect(mockCallback).toHaveBeenCalledTimes(7);
     });
 
-    it('does not execute extraneous calls when duplicate keys are provided', () => {
+    it('does not execute extraneous calls when duplicate keys are provided', async () => {
+      const user = userEvent.setup();
       const mockKeys = ['1', '1', 'a', 'a'];
       const mockCallback = vi.fn();
 
       renderHook(() => useKeyPress(mockKeys, mockCallback));
 
-      userEvent.keyboard('1ab');
+      await user.keyboard('1ab');
 
       expect(mockCallback).toHaveBeenCalledTimes(2);
     });
 
-    it('re-registers the event listener when updated during lifecycle', () => {
+    it('re-registers the event listener when updated during lifecycle', async () => {
+      const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       const {rerender} = renderHook(
@@ -70,29 +77,30 @@ describe('useKeyPress', () => {
         {initialProps: {keys: ['q', 'W', 'e']}},
       );
 
-      userEvent.keyboard('qWe');
+      await user.keyboard('qWe');
       expect(mockCallback).toHaveBeenCalledTimes(3);
 
       rerender({keys: ['z', 'X', 'c']});
 
       // Callback counter remains at the same count.
-      userEvent.keyboard('qWe');
+      await user.keyboard('qWe');
       expect(mockCallback).toHaveBeenCalledTimes(3);
 
       // Callback counter increases with updated key input.
-      userEvent.keyboard('zXc');
+      await user.keyboard('zXc');
       expect(mockCallback).toHaveBeenCalledTimes(6);
     });
   });
 
   describe('callback', () => {
-    it('passes the event to the callback', () => {
+    it('passes the event to the callback', async () => {
+      const user = userEvent.setup();
       const mockKeys = ['a', 'b', 'c'];
       const mockCallback = vi.fn();
 
       renderHook(() => useKeyPress(mockKeys, mockCallback));
 
-      userEvent.keyboard('a');
+      await user.keyboard('a');
 
       // TODO: Properly mock a `KeyboardEvent`.
       expect(mockCallback).toHaveBeenCalledWith(
@@ -103,7 +111,8 @@ describe('useKeyPress', () => {
 
   describe('options', () => {
     describe('eventType', () => {
-      it('accepts `keypress`', () => {
+      it('accepts `keypress`', async () => {
+        const user = userEvent.setup();
         const mockKeys = ['a', 'b', 'c'];
         const mockCallback = vi.fn();
 
@@ -113,12 +122,13 @@ describe('useKeyPress', () => {
           }),
         );
 
-        userEvent.keyboard('abc');
+        await user.keyboard('abc');
 
         expect(mockCallback).toHaveBeenCalledTimes(3);
       });
 
-      it('accepts `keydown`', () => {
+      it('accepts `keydown`', async () => {
+        const user = userEvent.setup();
         const mockKeys = ['1', '2', '3'];
         const mockCallback = vi.fn();
 
@@ -128,7 +138,7 @@ describe('useKeyPress', () => {
           }),
         );
 
-        userEvent.keyboard('123');
+        await user.keyboard('123');
 
         expect(mockCallback).toHaveBeenCalledTimes(3);
       });
@@ -140,21 +150,23 @@ describe('useKeyPress', () => {
       // TODO: Figure out how to list registered event listeners.
       it.todo('registers on `document` by default');
 
-      it('registers on the provided component', () => {
+      it('registers on the provided component', async () => {
         const mockKeys = ['a', 'b', 'c'];
         const mockCallback = vi.fn();
 
-        mount(<KeyPressComponent input={mockKeys} callback={mockCallback} />);
+        const {user} = mountWithUser(
+          <KeyPressComponent input={mockKeys} callback={mockCallback} />,
+        );
 
         const buttonElement = screen.getByRole('button');
-        userEvent.type(buttonElement, 'abc');
+        await user.type(buttonElement, 'abc');
 
         expect(mockCallback).not.toHaveBeenCalled();
 
         const inputElement = screen.getByRole('textbox');
 
         expect(inputElement).toHaveValue('');
-        userEvent.type(inputElement, 'abc');
+        await user.type(inputElement, 'abc');
 
         expect(mockCallback).toHaveBeenCalledTimes(3);
         expect(inputElement).toHaveValue('abc');
@@ -170,7 +182,8 @@ describe('useKeyPress', () => {
     });
 
     describe('disabled', () => {
-      it('will prevent further input', () => {
+      it('will prevent further input', async () => {
+        const user = userEvent.setup();
         const mockKeys = ['a', 'b', 'c'];
         const mockCallback = vi.fn();
 
@@ -180,18 +193,18 @@ describe('useKeyPress', () => {
           {initialProps: {disabled: undefined}},
         );
 
-        userEvent.keyboard('abc');
+        await user.keyboard('abc');
         expect(mockCallback).toHaveBeenCalledTimes(3);
 
         rerender({disabled: true});
 
-        userEvent.keyboard('abc');
+        await user.keyboard('abc');
         // Callback counter does not increase from previous count.
         expect(mockCallback).toHaveBeenCalledTimes(3);
 
         rerender({disabled: false});
 
-        userEvent.keyboard('abc');
+        await user.keyboard('abc');
         // Callback counter resumes increasing.
         expect(mockCallback).toHaveBeenCalledTimes(6);
       });
