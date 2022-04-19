@@ -117,7 +117,8 @@ export function useInterval(
   }, [playing, onPause]);
 
   useEffect(() => {
-    // TODO: This should be replaced with a `useMountedRef()` hook.
+    // Not using `useMounted()` hook, as we actually want to
+    // avoid calling `onPause()` on very first mount when `!playing`.
     mountedRef.current = true;
 
     return () => {
