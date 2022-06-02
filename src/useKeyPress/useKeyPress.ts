@@ -44,11 +44,6 @@ export function useKeyPress(
     callbackRef.current = callback;
   }, [callback]);
 
-  useEventListener({
-    eventType,
-    target,
-    disabled,
-    callback: handleCallback,
-    // options: {capture: true},
-  });
+  // TODO: Consider using {capture: true}
+  useEventListener(target, eventType, handleCallback, {disabled});
 }

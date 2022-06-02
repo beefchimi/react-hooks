@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 import {mountWithUser} from '../../test/utilities';
 import {useEventListener} from '../useEventListener';
+import type {SupportedEventListenerOptions} from '../types';
 import {AllowedEvent, EventListenerComponent} from './EventListenerComponent';
 
 describe('useEventListener', () => {
@@ -14,11 +15,7 @@ describe('useEventListener', () => {
       const mockCallback = vi.fn();
 
       renderHook(() =>
-        useEventListener({
-          eventType: AllowedEvent.KeyPress,
-          callback: mockCallback,
-          target: undefined,
-        }),
+        useEventListener(undefined, AllowedEvent.KeyPress, mockCallback),
       );
 
       await user.keyboard('foo');
@@ -34,11 +31,7 @@ describe('useEventListener', () => {
       const mockCallback = vi.fn();
 
       renderHook(() =>
-        useEventListener({
-          eventType: AllowedEvent.KeyPress,
-          callback: mockCallback,
-          target: document.body,
-        }),
+        useEventListener(document.body, AllowedEvent.KeyPress, mockCallback),
       );
 
       await user.keyboard('foo');
@@ -65,11 +58,7 @@ describe('useEventListener', () => {
       const mockCallback = vi.fn();
 
       const {unmount} = renderHook(() =>
-        useEventListener({
-          eventType: AllowedEvent.KeyPress,
-          callback: mockCallback,
-          target: document.body,
-        }),
+        useEventListener(document.body, AllowedEvent.KeyPress, mockCallback),
       );
 
       unmount();
@@ -107,11 +96,7 @@ describe('useEventListener', () => {
       const mockCallback = vi.fn();
 
       renderHook(() =>
-        useEventListener({
-          eventType: AllowedEvent.Click,
-          callback: mockCallback,
-          target: document.body,
-        }),
+        useEventListener(document.body, AllowedEvent.Click, mockCallback),
       );
 
       await user.click(document.body);
@@ -125,11 +110,7 @@ describe('useEventListener', () => {
 
       const {rerender} = renderHook(
         ({eventType}) =>
-          useEventListener({
-            eventType,
-            callback: mockCallback,
-            target: document.body,
-          }),
+          useEventListener(document.body, eventType, mockCallback),
         {initialProps: {eventType: AllowedEvent.Click}},
       );
 
@@ -152,11 +133,7 @@ describe('useEventListener', () => {
       const mockCallback = vi.fn();
 
       renderHook(() =>
-        useEventListener({
-          eventType: AllowedEvent.Click,
-          callback: mockCallback,
-          target: document.body,
-        }),
+        useEventListener(document.body, AllowedEvent.Click, mockCallback),
       );
 
       await user.click(document.body);
@@ -174,11 +151,7 @@ describe('useEventListener', () => {
 
       const {rerender} = renderHook(
         ({callback}) =>
-          useEventListener({
-            eventType: AllowedEvent.Click,
-            callback,
-            target: document.body,
-          }),
+          useEventListener(document.body, AllowedEvent.Click, callback),
         {
           initialProps: {
             callback: mockCallbackFirst,
@@ -199,23 +172,65 @@ describe('useEventListener', () => {
   });
 
   describe('options', () => {
-    const mockOptions: AddEventListenerOptions = {
+    describe('disabled', () => {
+      it('does not register when `true`', async () => {
+        const user = userEvent.setup();
+        const mockCallback = vi.fn();
+
+        const {rerender} = renderHook(
+          ({disabled}) =>
+            useEventListener(document.body, AllowedEvent.Click, mockCallback, {
+              disabled,
+            }),
+          {
+            initialProps: {
+              disabled: true,
+            },
+          },
+        );
+
+        await user.click(document.body);
+        expect(mockCallback).not.toHaveBeenCalled();
+
+        rerender({disabled: false});
+
+        await user.click(document.body);
+        expect(mockCallback).toHaveBeenCalledTimes(1);
+
+        rerender({disabled: true});
+
+        await user.click(document.body);
+        expect(mockCallback).not.toHaveBeenCalledTimes(2);
+      });
+    });
+
+    // TODO: Figure out the best way to test this.
+    describe('preferLayoutEffect', () => {
+      it.todo('uses `useEffect` by default');
+
+      it.todo('uses `useLayoutEffect` when `true`');
+    });
+  });
+
+  describe('listenerOptions', () => {
+    const mockListenerOptions: SupportedEventListenerOptions = {
       capture: true,
       passive: true,
       once: true,
     };
 
-    it('registers listener with the provided `options`', async () => {
+    it('registers listener with the provided `listenerOptions`', async () => {
       const user = userEvent.setup();
       const mockCallback = vi.fn();
 
       renderHook(() =>
-        useEventListener({
-          eventType: AllowedEvent.Click,
-          callback: mockCallback,
-          target: document.body,
-          options: mockOptions,
-        }),
+        useEventListener(
+          document.body,
+          AllowedEvent.Click,
+          mockCallback,
+          {},
+          mockListenerOptions,
+        ),
       );
 
       await user.click(document.body);
@@ -230,15 +245,16 @@ describe('useEventListener', () => {
 
       const {rerender} = renderHook(
         ({options}) =>
-          useEventListener({
-            eventType: AllowedEvent.Click,
-            callback: mockCallback,
-            target: document.body,
+          useEventListener(
+            document.body,
+            AllowedEvent.Click,
+            mockCallback,
+            {},
             options,
-          }),
+          ),
         {
           initialProps: {
-            options: mockOptions,
+            options: mockListenerOptions,
           },
         },
       );
@@ -249,53 +265,11 @@ describe('useEventListener', () => {
       await user.click(document.body);
       expect(mockCallback).not.toHaveBeenCalledTimes(2);
 
-      rerender({options: {...mockOptions, once: false}});
+      rerender({options: {...mockListenerOptions, once: false}});
 
       await user.click(document.body);
       await user.click(document.body);
       expect(mockCallback).toHaveBeenCalledTimes(3);
     });
-  });
-
-  describe('disabled', () => {
-    it('does not register when `true`', async () => {
-      const user = userEvent.setup();
-      const mockCallback = vi.fn();
-
-      const {rerender} = renderHook(
-        ({disabled}) =>
-          useEventListener({
-            eventType: AllowedEvent.Click,
-            callback: mockCallback,
-            target: document.body,
-            disabled,
-          }),
-        {
-          initialProps: {
-            disabled: true,
-          },
-        },
-      );
-
-      await user.click(document.body);
-      expect(mockCallback).not.toHaveBeenCalled();
-
-      rerender({disabled: false});
-
-      await user.click(document.body);
-      expect(mockCallback).toHaveBeenCalledTimes(1);
-
-      rerender({disabled: true});
-
-      await user.click(document.body);
-      expect(mockCallback).not.toHaveBeenCalledTimes(2);
-    });
-  });
-
-  // TODO: Figure out the best way to test this.
-  describe('preferLayoutEffect', () => {
-    it.todo('uses `useEffect` by default');
-
-    it.todo('uses `useLayoutEffect` when `true`');
   });
 });
