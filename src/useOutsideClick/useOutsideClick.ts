@@ -35,12 +35,11 @@ export function useOutsideClick(
     callbackRef.current = callback;
   }, [callback, element]);
 
-  useEventListener({
-    eventType: 'click',
-    callback: memoizedCallback,
-    target: element?.ownerDocument,
-    options: {
-      capture: true,
-    },
-  });
+  useEventListener(
+    element?.ownerDocument,
+    'click',
+    memoizedCallback,
+    {},
+    {capture: true},
+  );
 }
