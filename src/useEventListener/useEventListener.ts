@@ -1,18 +1,38 @@
 import {useEffect, useRef} from 'react';
 
+import {filterNullishValuesFromObject} from '../utilities';
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
-import type {GlobalEventCallback} from '../types';
-import type {EventListenerHookOptions} from './types';
+import type {GlobalEventCallback, GlobalEventTarget} from '../types';
+import type {
+  EventListenerHookOptions,
+  SupportedEventListenerOptions,
+} from './types';
 
-export function useEventListener({
-  eventType,
-  callback,
-  target,
-  options = {},
-  disabled = false,
-  preferLayoutEffect = false,
-}: EventListenerHookOptions): void {
-  const {capture, passive, once} = options;
+const DEFAULT_OPTIONS: Required<EventListenerHookOptions> = {
+  disabled: false,
+  preferLayoutEffect: false,
+};
+
+const DEFAULT_LISTENER_OPTIONS: SupportedEventListenerOptions = {};
+
+export function useEventListener(
+  target: GlobalEventTarget,
+  eventType: string,
+  callback: GlobalEventCallback,
+  options?: EventListenerHookOptions,
+  listenerOptions?: SupportedEventListenerOptions,
+): void {
+  const {disabled, preferLayoutEffect} = {
+    ...DEFAULT_OPTIONS,
+    ...filterNullishValuesFromObject<EventListenerHookOptions>(options ?? {}),
+  };
+
+  const {capture, passive, once} = {
+    ...DEFAULT_LISTENER_OPTIONS,
+    ...filterNullishValuesFromObject<SupportedEventListenerOptions>(
+      listenerOptions ?? {},
+    ),
+  };
 
   const callbackRef = useRef(callback);
 
@@ -33,11 +53,11 @@ export function useEventListener({
     };
 
     if (!disabled && target) {
-      target.addEventListener(eventType, handleCallback, options);
+      target.addEventListener(eventType, handleCallback, listenerOptions);
     }
 
     return () => {
-      target?.removeEventListener(eventType, handleCallback, options);
+      target?.removeEventListener(eventType, handleCallback, listenerOptions);
     };
   }, [eventType, target, disabled, capture, passive, once]);
 }

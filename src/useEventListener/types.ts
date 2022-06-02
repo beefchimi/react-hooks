@@ -1,10 +1,9 @@
-import type {GlobalEventCallback, GlobalEventTarget} from '../types';
-
 export interface EventListenerHookOptions {
-  eventType: string;
-  callback: GlobalEventCallback;
-  target?: GlobalEventTarget;
-  options?: AddEventListenerOptions;
   disabled?: boolean;
   preferLayoutEffect?: boolean;
 }
+
+// TODO: Consider merging `options` and `listenerOptions`
+// into a single arg / interface.
+export interface SupportedEventListenerOptions
+  extends Pick<AddEventListenerOptions, 'capture' | 'passive' | 'once'> {}

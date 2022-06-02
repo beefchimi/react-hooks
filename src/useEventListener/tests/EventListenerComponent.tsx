@@ -2,28 +2,31 @@ import React from 'react';
 
 import {useInstantRef} from '../../useInstantRef';
 import {useEventListener} from '../useEventListener';
-import type {EventListenerHookOptions} from '../types';
+
+import type {GlobalEventCallback} from '../../types';
+import type {
+  EventListenerHookOptions,
+  SupportedEventListenerOptions,
+} from '../types';
 
 export enum AllowedEvent {
   Click = 'click',
   KeyPress = 'keypress',
 }
 
-export interface EventListenerComponentProps
-  extends Pick<
-    EventListenerHookOptions,
-    'callback' | 'options' | 'disabled' | 'preferLayoutEffect'
-  > {
+export interface EventListenerComponentProps {
+  callback: GlobalEventCallback;
+  options?: EventListenerHookOptions;
+  listenerOptions?: SupportedEventListenerOptions;
   eventType?: AllowedEvent;
   attachToDocument?: boolean;
 }
 
 export function EventListenerComponent({
-  eventType = AllowedEvent.Click,
   callback,
   options,
-  disabled,
-  preferLayoutEffect,
+  listenerOptions,
+  eventType = AllowedEvent.Click,
   attachToDocument = false,
 }: EventListenerComponentProps) {
   const [buttonElement, buttonRef] = useInstantRef<HTMLButtonElement>();
@@ -32,14 +35,7 @@ export function EventListenerComponent({
     ? buttonElement?.ownerDocument
     : buttonElement;
 
-  useEventListener({
-    eventType,
-    callback,
-    target,
-    options,
-    disabled,
-    preferLayoutEffect,
-  });
+  useEventListener(target, eventType, callback, options, listenerOptions);
 
   return (
     <div className="EventListenerComponent">
