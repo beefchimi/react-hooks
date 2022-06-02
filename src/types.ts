@@ -3,7 +3,12 @@ export interface BasicObject {
 }
 
 export type GlobalEventCallback = (event: any) => void;
-export type GlobalEventTarget = Document | Window | HTMLElement | null;
+export type GlobalEventTarget =
+  | Document
+  | Window
+  | HTMLElement
+  | null
+  | undefined;
 
 export type UtcMilliseconds = number;
 
