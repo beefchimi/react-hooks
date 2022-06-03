@@ -13,7 +13,7 @@ describe('useInterval > utilities', () => {
     };
 
     describe('early return', () => {
-      it('returns 0 when `skipFirstInterval` is `true` and `firstIntervalPlayed` is `false`', () => {
+      it('returns 0 when `skipFirstInterval` is `true` and `firstIntervalPlayed` is `false`', async () => {
         const result = getDelay({
           ...mockArgs,
           skipFirstInterval: true,
@@ -22,7 +22,7 @@ describe('useInterval > utilities', () => {
         expect(result).toBe(0);
       });
 
-      it('does not return 0 when `skipFirstInterval` is `false` and `firstIntervalPlayed` is `true`', () => {
+      it('does not return 0 when `skipFirstInterval` is `false` and `firstIntervalPlayed` is `true`', async () => {
         const result = getDelay({
           ...mockArgs,
           firstIntervalPlayed: true,
@@ -31,7 +31,7 @@ describe('useInterval > utilities', () => {
         expect(result).not.toBe(0);
       });
 
-      it('does not return 0 when both `skipFirstInterval` and `firstIntervalPlayed` are `true`', () => {
+      it('does not return 0 when both `skipFirstInterval` and `firstIntervalPlayed` are `true`', async () => {
         const result = getDelay({
           ...mockArgs,
           skipFirstInterval: true,
@@ -42,7 +42,7 @@ describe('useInterval > utilities', () => {
       });
     });
 
-    it('returns `timeRemaining` when `allowPausing` is `true`', () => {
+    it('returns `timeRemaining` when `allowPausing` is `true`', async () => {
       const result = getDelay({
         ...mockArgs,
         allowPausing: true,
@@ -51,7 +51,7 @@ describe('useInterval > utilities', () => {
       expect(result).toBe(mockArgs.timeRemaining);
     });
 
-    it('returns `duration` when `allowPausing` is `false`', () => {
+    it('returns `duration` when `allowPausing` is `false`', async () => {
       const result = getDelay({
         ...mockArgs,
       });
