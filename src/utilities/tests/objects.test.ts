@@ -32,7 +32,7 @@ describe('Object utilities', () => {
       ...questionableValues,
     };
 
-    it('returns object with all keys pointing to nullish values removed', () => {
+    it('returns object with all keys pointing to nullish values removed', async () => {
       const result = filterNullishValuesFromObject(mockObject);
 
       expect(result).toStrictEqual({

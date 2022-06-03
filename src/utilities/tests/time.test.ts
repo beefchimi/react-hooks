@@ -12,7 +12,7 @@ describe('Time utilities', () => {
   const ms11Days10Hrs20Mins54Secs = 987654321;
 
   describe('flipTimeSign', () => {
-    it('flips positive values to negative', () => {
+    it('flips positive values to negative', async () => {
       const mockPositiveTime: Time24HourBreakdown = {
         days: 0,
         hours: 1,
@@ -29,7 +29,7 @@ describe('Time utilities', () => {
       });
     });
 
-    it('flips negative values to positive', () => {
+    it('flips negative values to positive', async () => {
       const mockNegativeTime: Time24HourBreakdown = {
         days: -4,
         hours: -5,
@@ -46,7 +46,7 @@ describe('Time utilities', () => {
       });
     });
 
-    it('does not flip sign on `0` values', () => {
+    it('does not flip sign on `0` values', async () => {
       const mockMixedTime: Time24HourBreakdown = {
         days: 0,
         hours: 1,
@@ -65,7 +65,7 @@ describe('Time utilities', () => {
   });
 
   describe('msToTime', () => {
-    it('returns 24-hour breakdown from provided UTC milliseconds', () => {
+    it('returns 24-hour breakdown from provided UTC milliseconds', async () => {
       const greaterthan24Hrs = msToTime(
         ms1Day + ms15Hrs + ms10Hrs15Mins + ms4Hrs15Mins5Secs,
       );
@@ -96,7 +96,7 @@ describe('Time utilities', () => {
       });
     });
 
-    it('returns breakdown from positive milliseconds', () => {
+    it('returns breakdown from positive milliseconds', async () => {
       const ms18Secs = msToTime(msPerSec * 18);
 
       expect(ms18Secs).toStrictEqual({
@@ -107,7 +107,7 @@ describe('Time utilities', () => {
       });
     });
 
-    it('rounds down all properties to the nearest value', () => {
+    it('rounds down all properties to the nearest value', async () => {
       const roundedDownWhole = msToTime(ms11Days10Hrs20Mins54Secs);
 
       expect(roundedDownWhole).toStrictEqual({
@@ -145,7 +145,7 @@ describe('Time utilities', () => {
       });
     });
 
-    it('returns breakdown from `0` milliseconds', () => {
+    it('returns breakdown from `0` milliseconds', async () => {
       const outOfTime = msToTime(0);
 
       expect(outOfTime).toStrictEqual({
@@ -156,7 +156,7 @@ describe('Time utilities', () => {
       });
     });
 
-    it('returns breakdown from negative milliseconds', () => {
+    it('returns breakdown from negative milliseconds', async () => {
       const timeAgo1Sec = msToTime(-msPerSec);
 
       expect(timeAgo1Sec).toStrictEqual({
