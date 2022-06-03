@@ -9,7 +9,6 @@ const testConfig: vitestTypes.InlineConfig = {
   setupFiles: './src/test/setup.ts',
 };
 
-// TODO: Do we actually need to include React DOM?
 export default defineConfig({
   test: testConfig,
   plugins: [pluginReact(), dtsPlugin()],
@@ -23,14 +22,17 @@ export default defineConfig({
       // Make sure to externalize dependencies that
       // SHOULD NOT be bundled into your library.
       // external: [...Object.keys(peerDependencies)]
-      external: ['react', 'react-dom'],
+      external: [
+        'react',
+        // 'react-dom',
+      ],
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
         // If we do not care about UMD, we can remove this.
         globals: {
           react: 'React',
-          'react-dom': 'ReactDOM',
+          // 'react-dom': 'ReactDOM',
         },
 
         // Since we publish our ./src folder, there's no point
