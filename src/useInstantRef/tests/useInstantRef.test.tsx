@@ -6,7 +6,7 @@ import {InstantRefComponent} from './InstantRefComponent';
 import {NormalRefComponent} from './NormalRefComponent';
 
 describe('useInstantRef', () => {
-  it('immediately triggers a re-render and defines a value', () => {
+  it('immediately triggers a re-render and defines a value', async () => {
     const mockOnFocus = vi.fn();
     mount(<InstantRefComponent onFocus={mockOnFocus} />);
 
@@ -17,7 +17,7 @@ describe('useInstantRef', () => {
   });
 
   describe('useRef', () => {
-    it('does not hold a reference to a DOM node on first render', () => {
+    it('does not hold a reference to a DOM node on first render', async () => {
       const mockOnFocus = vi.fn();
       mount(<NormalRefComponent onFocus={mockOnFocus} />);
 
@@ -27,7 +27,7 @@ describe('useInstantRef', () => {
       expect(document.activeElement).not.toBe(buttonElement);
     });
 
-    it('will reference a DOM node once rerendered', () => {
+    it('will reference a DOM node once rerendered', async () => {
       const mockOnFocus = vi.fn();
       const {rerender} = mount(<NormalRefComponent onFocus={mockOnFocus} />);
 
