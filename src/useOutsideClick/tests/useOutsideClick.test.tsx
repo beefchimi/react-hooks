@@ -73,34 +73,76 @@ describe('useOutsideClick', () => {
     });
   });
 
-  describe('exclude', () => {
-    const mockOnAction = vi.fn();
+  describe('options', () => {
+    describe('disabled', () => {
+      const mockOnAction = vi.fn();
 
-    it('will not trigger callback when click matches an excluded element', async () => {
-      const mockOnOutsideClick = vi.fn();
+      it('will not trigger callback when toggled', async () => {
+        const mockOnOutsideClick = vi.fn();
 
-      const {user} = mountWithUser(
-        <OutsideClickComponent
-          exclude
-          onAction={mockOnAction}
-          onOutsideClick={mockOnOutsideClick}
-        />,
-      );
+        const {user, rerender} = mountWithUser(
+          <OutsideClickComponent
+            onAction={mockOnAction}
+            onOutsideClick={mockOnOutsideClick}
+          />,
+        );
 
-      const firstElement = screen.getByText(/first element/i);
-      await user.click(firstElement);
+        const firstElement = screen.getByText(/first element/i);
+        await user.click(firstElement);
+        expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
 
-      expect(mockOnOutsideClick).not.toHaveBeenCalled();
+        rerender(
+          <OutsideClickComponent
+            disabled
+            onAction={mockOnAction}
+            onOutsideClick={mockOnOutsideClick}
+          />,
+        );
 
-      const lastElement = screen.getByText(/last element/i);
-      await user.click(lastElement);
+        await user.click(firstElement);
+        expect(mockOnOutsideClick).not.toHaveBeenCalledTimes(2);
 
-      expect(mockOnOutsideClick).not.toHaveBeenCalled();
+        rerender(
+          <OutsideClickComponent
+            onAction={mockOnAction}
+            onOutsideClick={mockOnOutsideClick}
+          />,
+        );
 
-      const outsideElement = screen.getByTestId('OutsideElement');
-      await user.click(outsideElement);
+        await user.click(firstElement);
+        expect(mockOnOutsideClick).toHaveBeenCalledTimes(2);
+      });
+    });
 
-      expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
+    describe('exclude', () => {
+      const mockOnAction = vi.fn();
+
+      it('will not trigger callback when click matches an excluded element', async () => {
+        const mockOnOutsideClick = vi.fn();
+
+        const {user} = mountWithUser(
+          <OutsideClickComponent
+            exclude
+            onAction={mockOnAction}
+            onOutsideClick={mockOnOutsideClick}
+          />,
+        );
+
+        const firstElement = screen.getByText(/first element/i);
+        await user.click(firstElement);
+
+        expect(mockOnOutsideClick).not.toHaveBeenCalled();
+
+        const lastElement = screen.getByText(/last element/i);
+        await user.click(lastElement);
+
+        expect(mockOnOutsideClick).not.toHaveBeenCalled();
+
+        const outsideElement = screen.getByTestId('OutsideElement');
+        await user.click(outsideElement);
+
+        expect(mockOnOutsideClick).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });
