@@ -16,7 +16,7 @@ describe('useIsoLayoutEffect', () => {
   });
 
   describe('callback', () => {
-    it('executes on mount', () => {
+    it('executes on mount', async () => {
       const mockCallback = vi.fn();
 
       renderHook(() => useIsoLayoutEffect(mockCallback));
@@ -25,7 +25,7 @@ describe('useIsoLayoutEffect', () => {
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    it('executes again after dependency change', () => {
+    it('executes again after dependency change', async () => {
       const mockCallback = vi.fn();
 
       const {rerender} = renderHook(
