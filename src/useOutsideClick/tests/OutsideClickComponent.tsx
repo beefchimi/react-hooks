@@ -7,12 +7,14 @@ import type {OutsideClickCallback} from '../types';
 export interface OutsideClickComponentProps {
   onAction(): void;
   onOutsideClick: OutsideClickCallback;
+  disabled?: boolean;
   exclude?: boolean;
 }
 
 export function OutsideClickComponent({
   onAction,
   onOutsideClick,
+  disabled = false,
   exclude = false,
 }: OutsideClickComponentProps) {
   const [buttonElement, buttonRef] = useInstantRef<HTMLButtonElement>();
@@ -20,11 +22,12 @@ export function OutsideClickComponent({
   const firstElementRef = useRef<HTMLHeadingElement>(null);
   const lastElementRef = useRef<HTMLParagraphElement>(null);
 
-  useOutsideClick(
-    buttonElement,
-    onOutsideClick,
-    exclude ? [firstElementRef.current, lastElementRef.current] : undefined,
-  );
+  useOutsideClick(buttonElement, onOutsideClick, {
+    disabled,
+    exclude: exclude
+      ? [firstElementRef.current, lastElementRef.current]
+      : undefined,
+  });
 
   return (
     <div className="OutsideClickComponent">
