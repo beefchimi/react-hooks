@@ -35,7 +35,7 @@ describe('useTimeout', () => {
 
     const mockDuration = 100;
 
-    it('does not execute before the timeout has expired', () => {
+    it('does not execute before the timeout has expired', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useTimeout(mockCallback, {duration: mockDuration}));
@@ -44,7 +44,7 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('executes after timeout has expired', () => {
+    it('executes after timeout has expired', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useTimeout(mockCallback, {duration: mockDuration}));
@@ -55,7 +55,7 @@ describe('useTimeout', () => {
   });
 
   describe('duration', () => {
-    it('executes `callback` immediately by default', () => {
+    it('executes `callback` immediately by default', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useTimeout(mockCallback));
@@ -65,7 +65,7 @@ describe('useTimeout', () => {
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    it('executes `callback` immediately when `0`', () => {
+    it('executes `callback` immediately when `0`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useTimeout(mockCallback, {duration: 0}));
@@ -79,7 +79,7 @@ describe('useTimeout', () => {
   describe('playing', () => {
     const mockDuration = 100;
 
-    it('does not execute when `false`', () => {
+    it('does not execute when `false`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() =>
@@ -90,7 +90,7 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('will prevent `callback` from executing when toggled before expiration', () => {
+    it('will prevent `callback` from executing when toggled before expiration', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(
@@ -108,7 +108,7 @@ describe('useTimeout', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('will restart the timeout from the beginning when toggled back and forth', () => {
+    it('will restart the timeout from the beginning when toggled back and forth', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(({playing}: TimeoutHookOptions) =>

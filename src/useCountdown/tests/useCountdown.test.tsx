@@ -44,7 +44,7 @@ describe('useCountdown', () => {
   });
 
   describe('callback', () => {
-    it('executes immediately', () => {
+    it('executes immediately', async () => {
       const mockCallback = vi.fn((difference) => difference);
 
       renderHook(() => useCountdown(mockCallback, mockTimeStart));
@@ -52,7 +52,7 @@ describe('useCountdown', () => {
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    it('executes again after first second', () => {
+    it('executes again after first second', async () => {
       const mockCallback = vi.fn((difference) => difference);
 
       renderHook(() => useCountdown(mockCallback, mockTimeStart));
@@ -62,7 +62,7 @@ describe('useCountdown', () => {
       expect(mockCallback).not.toHaveBeenCalledTimes(3);
     });
 
-    it('executes multiple times after enough time has passed', () => {
+    it('executes multiple times after enough time has passed', async () => {
       const mockCallback = vi.fn((difference) => difference);
       const iterations = 5;
 
@@ -75,7 +75,7 @@ describe('useCountdown', () => {
       expect(mockCallback).toHaveBeenCalledTimes(iterations + 1);
     });
 
-    it('seemlessly continues (does not restart) iterations when `callback` changes mid-iteration', () => {
+    it('seemlessly continues (does not restart) iterations when `callback` changes mid-iteration', async () => {
       let recordedDifference = 0;
       const mockInitialCallback = vi.fn((difference) => {
         recordedDifference = difference;
@@ -111,7 +111,7 @@ describe('useCountdown', () => {
   });
 
   describe('timeTarget', () => {
-    it('returns 0 as first result when using `Date.now()`', () => {
+    it('returns 0 as first result when using `Date.now()`', async () => {
       const mockCallback = vi.fn((difference) => difference);
 
       renderHook(() => useCountdown(mockCallback, mockTimeStart));
@@ -119,7 +119,7 @@ describe('useCountdown', () => {
       expect(mockCallback).toHaveBeenCalledWith(0);
     });
 
-    it('will produce negative 1 second increments when using `Date.now()`', () => {
+    it('will produce negative 1 second increments when using `Date.now()`', async () => {
       const mockCallback = vi.fn((difference) => difference);
 
       renderHook(() => useCountdown(mockCallback, mockTimeStart));
@@ -140,7 +140,7 @@ describe('useCountdown', () => {
       expect(mockCallback).toHaveBeenCalledWith(-fourSeconds);
     });
 
-    it('will produce a result reduced by 1 second per interval', () => {
+    it('will produce a result reduced by 1 second per interval', async () => {
       const mockCallback = vi.fn((difference) => difference);
       const initialOffset = mockTime24hLater - mockTimeStart;
 
@@ -167,7 +167,7 @@ describe('useCountdown', () => {
       expect(mockCallback).toHaveBeenCalledWith(initialOffset - fourSeconds);
     });
 
-    it('immediately returns new `difference` when updated mid-iteration', () => {
+    it('immediately returns new `difference` when updated mid-iteration', async () => {
       const mockCallback = vi.fn((difference) => difference);
       const initialOffset = mockTime24hLater - mockTimeStart;
 
@@ -193,7 +193,7 @@ describe('useCountdown', () => {
       expect(mockCallback).not.toHaveBeenCalledTimes(5);
     });
 
-    it('continues mid-interval when `timeRange` changes while iterating', () => {
+    it('continues mid-interval when `timeRange` changes while iterating', async () => {
       const mockCallback = vi.fn((difference) => difference);
       const initialOffset = mockTime24hLater - mockTimeStart;
 
@@ -227,7 +227,7 @@ describe('useCountdown', () => {
   });
 
   describe('pause', () => {
-    it('does not execute when `true`', () => {
+    it('does not execute when `true`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useCountdown(mockCallback, mockTimeStart, true));
@@ -236,7 +236,7 @@ describe('useCountdown', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('stops performing iterations', () => {
+    it('stops performing iterations', async () => {
       const mockCallback = vi.fn((difference) => difference);
 
       const {rerender} = renderHook(
@@ -254,7 +254,7 @@ describe('useCountdown', () => {
       expect(mockCallback).not.toHaveBeenCalledTimes(3);
     });
 
-    it('will restart from the paused position when toggled back and forth', () => {
+    it('will restart from the paused position when toggled back and forth', async () => {
       const mockCallback = vi.fn((difference) => difference);
 
       const {rerender} = renderHook(

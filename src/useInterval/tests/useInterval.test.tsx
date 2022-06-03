@@ -35,7 +35,7 @@ describe('useInterval', () => {
 
     const mockDuration = 100;
 
-    it('does not execute before the first interation has elapsed', () => {
+    it('does not execute before the first interation has elapsed', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
@@ -44,7 +44,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('executes once after first iteration', () => {
+    it('executes once after first iteration', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useInterval(mockCallback, {duration: mockDuration}));
@@ -54,7 +54,7 @@ describe('useInterval', () => {
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
 
-    it('executes multiple times after enough time has passed', () => {
+    it('executes multiple times after enough time has passed', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
       const iterations = 3;
 
@@ -65,7 +65,7 @@ describe('useInterval', () => {
       expect(mockCallback).toHaveBeenCalledWith(mockTimestamp);
     });
 
-    it('seemlessly continues (does not restart) iterations when `callback` changes mid-iteration', () => {
+    it('seemlessly continues (does not restart) iterations when `callback` changes mid-iteration', async () => {
       const mockInitialCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(
@@ -96,7 +96,7 @@ describe('useInterval', () => {
   });
 
   describe('duration', () => {
-    it('executes `callback` immediately by default', () => {
+    it('executes `callback` immediately by default', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useInterval(mockCallback));
@@ -111,7 +111,7 @@ describe('useInterval', () => {
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    it('executes `callback` immediately when `0`', () => {
+    it('executes `callback` immediately when `0`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() => useInterval(mockCallback, {duration: 0}));
@@ -125,7 +125,7 @@ describe('useInterval', () => {
   describe('playing', () => {
     const mockDuration = 100;
 
-    it('does not execute when `false`', () => {
+    it('does not execute when `false`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() =>
@@ -136,7 +136,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('will prevent `callback` from executing when toggled before expiration', () => {
+    it('will prevent `callback` from executing when toggled before expiration', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(
@@ -154,7 +154,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('will restart the timeout from the beginning when toggled back and forth without `allowPausing`', () => {
+    it('will restart the timeout from the beginning when toggled back and forth without `allowPausing`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(({playing}: IntervalHookOptions) =>
@@ -183,7 +183,7 @@ describe('useInterval', () => {
     const mockDuration = 100;
     const pauseOffset = 10;
 
-    it('will restart the timeout from the paused position when toggled back and forth', () => {
+    it('will restart the timeout from the paused position when toggled back and forth', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       const {rerender} = renderHook(({playing}: IntervalHookOptions) =>
@@ -215,7 +215,7 @@ describe('useInterval', () => {
   describe('skipFirstInterval', () => {
     const mockDuration = 100;
 
-    it('will fire immediately then resume execution at defined intervals', () => {
+    it('will fire immediately then resume execution at defined intervals', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       renderHook(() =>
@@ -239,7 +239,7 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalledTimes(4);
     });
 
-    it('will not reset intervals if changed while mounted', () => {
+    it('will not reset intervals if changed while mounted', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 
       // TODO: This test does not pass if `initialProps` is `undefined`.
@@ -276,7 +276,7 @@ describe('useInterval', () => {
   describe('onPause', () => {
     const mockDuration = 100;
 
-    it('does not execute when `playing`', () => {
+    it('does not execute when `playing`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
       const mockOnPause = vi.fn((timeData) => timeData);
 
@@ -291,7 +291,7 @@ describe('useInterval', () => {
       expect(mockOnPause).not.toHaveBeenCalled();
     });
 
-    it('does not execute immediately if hook is initialized with `!playing`', () => {
+    it('does not execute immediately if hook is initialized with `!playing`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
       const mockOnPause = vi.fn((timeData) => timeData);
 
@@ -307,7 +307,7 @@ describe('useInterval', () => {
       expect(mockOnPause).not.toHaveBeenCalled();
     });
 
-    it('executes with `timeData` when `playing` is toggled to `false`', () => {
+    it('executes with `timeData` when `playing` is toggled to `false`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
       const mockOnPause = vi.fn((timeData) => timeData);
 
@@ -361,7 +361,7 @@ describe('useInterval', () => {
       });
     });
 
-    it('continues along timeline when `allowPausing`', () => {
+    it('continues along timeline when `allowPausing`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
       const mockOnPause = vi.fn((timeData) => timeData);
 
