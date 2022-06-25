@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {canUseDom, filterNullishValuesFromObject} from '../utilities';
+import {detectHasDom, filterNullishValuesFromObject} from '../utilities';
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 
 import type {ScrollLockOptions, ScrollLockHookReturn} from './types';
@@ -57,5 +57,5 @@ export function useScrollLock(
 function guessScrollbarWidth() {
   // A better alternative might be:
   // document.body.offsetWidth - document.body.scrollWidth
-  return canUseDom ? window.innerWidth - document.body.offsetWidth : 0;
+  return detectHasDom() ? window.innerWidth - document.body.offsetWidth : 0;
 }
