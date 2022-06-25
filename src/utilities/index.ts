@@ -1,4 +1,4 @@
-export {canUseDom} from './detect';
+export {detectHasDom} from './detect';
 export {noop} from './noop';
 
 export {flipNumberSign, leftPadNumber} from './numbers';
