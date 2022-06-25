@@ -3,11 +3,14 @@ import {useState} from 'react';
 import {detectHasDom, filterNullishValuesFromObject} from '../utilities';
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 
+import {ScrollAxis} from './types';
 import type {ScrollLockOptions, ScrollLockHookReturn} from './types';
 
 const DEFAULT_OPTIONS: ScrollLockOptions = {
   // Using optional chaining on `document` in case this is SSR.
   target: document?.body,
+  scrollAxis: ScrollAxis.Vertical,
+  bypassScrollbarFix: false,
 };
 
 export function useScrollLock(
@@ -15,6 +18,7 @@ export function useScrollLock(
 ): ScrollLockHookReturn {
   const [scrollingLocked, setScrollLock] = useState(false);
 
+  // scrollAxis, bypassScrollbarFix
   const {target, scrollbarOffset} = {
     ...DEFAULT_OPTIONS,
     ...filterNullishValuesFromObject<ScrollLockOptions>(options ?? {}),
@@ -56,6 +60,8 @@ export function useScrollLock(
 
 function guessScrollbarWidth() {
   // A better alternative might be:
-  // document.body.offsetWidth - document.body.scrollWidth
-  return detectHasDom() ? window.innerWidth - document.body.offsetWidth : 0;
+  // (target || document.body).offsetWidth - (target || document.body).scrollWidth
+  return detectHasDom()
+    ? window.innerWidth - document.documentElement.clientWidth
+    : 0;
 }
