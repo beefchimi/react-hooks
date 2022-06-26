@@ -15,6 +15,13 @@ export enum ScrollAxis {
 export interface ScrollLockOptions {
   target?: HTMLElement | null;
   scrollAxis?: ScrollAxis;
+
+  // There is intentionally only one "scrollbar size" for both
+  // `x` and `y` axis. Supporting the case where sizes would be different
+  // is so rare that it isn't worth the complexity.
   scrollbarOffset?: number;
-  bypassScrollbarFix?: boolean;
+
+  // Consider a prop that allows skipping the
+  // scrollbar width `padding-right` reservation.
+  // bypassReservedScrollPadding?: boolean;
 }
