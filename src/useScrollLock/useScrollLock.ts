@@ -3,11 +3,19 @@ import {useState} from 'react';
 import {filterNullishValuesFromObject} from '../utilities';
 import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 
-import {getPaddingRight, guessScrollbarWidth} from './utilities';
+import {
+  applyScrollStyles,
+  resetScrollStyles,
+  guessScrollbarWidth,
+} from './utilities';
 import {ScrollAxis} from './types';
-import type {ScrollLockOptions, ScrollLockHookReturn} from './types';
+import type {
+  DefaultScrollLockOptions,
+  ScrollLockOptions,
+  ScrollLockHookReturn,
+} from './types';
 
-const DEFAULT_OPTIONS: ScrollLockOptions = {
+const DEFAULT_OPTIONS: DefaultScrollLockOptions = {
   // Using optional chaining on `document` in case this is SSR.
   target: document?.body,
   scrollAxis: ScrollAxis.Vertical,
@@ -18,8 +26,7 @@ export function useScrollLock(
 ): ScrollLockHookReturn {
   const [scrollingLocked, setScrollLock] = useState(false);
 
-  // scrollAxis
-  const {target, scrollbarOffset} = {
+  const {target, scrollAxis, scrollbarOffset, onLock, onUnlock} = {
     ...DEFAULT_OPTIONS,
     ...filterNullishValuesFromObject<ScrollLockOptions>(options ?? {}),
   };
@@ -32,29 +39,32 @@ export function useScrollLock(
     // An explicitly passed `scrollbarOffset` could be `0`,
     // so we will accept that value if passed.
     const scrollbarWidth = scrollbarOffset ?? guessScrollbarWidth();
-    const computedPaddingRight = getPaddingRight();
 
-    // Should these instead be stored as refs?
     const originalOverflow = target.style.overflow;
     const originalPaddingRight = target.style.paddingRight;
+    const originalPaddingBottom = target.style.paddingBottom;
 
-    target.style.overflow = 'hidden';
+    const captured = applyScrollStyles({
+      target,
+      scrollAxis,
+      scrollbarWidth,
+    });
 
-    // TODO: We should also consider horizontal scrolling.
-    if (scrollbarWidth) {
-      target.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
-    }
+    onLock?.(captured);
 
     // TODO: Adjust linting so that an early return is acceptable.
     // eslint-disable-next-line consistent-return
     return () => {
-      target.style.overflow = originalOverflow;
+      resetScrollStyles({
+        target,
+        overflow: originalOverflow,
+        paddingRight: originalPaddingRight,
+        paddingBottom: originalPaddingBottom,
+      });
 
-      if (scrollbarWidth) {
-        target.style.paddingRight = originalPaddingRight;
-      }
+      onUnlock?.();
     };
-  }, [target, scrollbarOffset, scrollingLocked]);
+  }, [scrollingLocked, target, scrollAxis, scrollbarOffset, onLock, onUnlock]);
 
   return [scrollingLocked, setScrollLock];
 }
