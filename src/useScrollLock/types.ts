@@ -12,6 +12,14 @@ export enum ScrollAxis {
   Both = 'both',
 }
 
+export interface ScrollLockCapturedProperties {
+  scrollbarWidth?: number;
+  paddingRight?: number;
+  appliedPaddingRight?: number;
+  paddingBottom?: number;
+  appliedPaddingBottom?: number;
+}
+
 export interface ScrollLockOptions {
   target?: HTMLElement | null;
   scrollAxis?: ScrollAxis;
@@ -23,5 +31,14 @@ export interface ScrollLockOptions {
 
   // Consider a prop that allows skipping the
   // scrollbar width `padding-right` reservation.
-  // bypassReservedScrollPadding?: boolean;
+  // bypassScrollPadding?: boolean;
+
+  onLock?(captured: ScrollLockCapturedProperties): void;
+  onUnlock?(): void;
 }
+
+export interface DefaultScrollLockOptions extends ScrollLockOptions {
+  scrollAxis: NonNullable<ScrollLockOptions['scrollAxis']>;
+}
+
+export type RequiredTarget = NonNullable<ScrollLockOptions['target']>;
