@@ -6,7 +6,8 @@ import {useIsoLayoutEffect} from '../useIsoLayoutEffect';
 import {
   applyScrollStyles,
   resetScrollStyles,
-  guessScrollbarWidth,
+  guessScrollbarWidthVertical,
+  guessScrollbarWidthHorizontal,
 } from './utilities';
 import {ScrollAxis} from './types';
 import type {
@@ -38,7 +39,10 @@ export function useScrollLock(
 
     // An explicitly passed `scrollbarOffset` could be `0`,
     // so we will accept that value if passed.
-    const scrollbarWidth = scrollbarOffset ?? guessScrollbarWidth();
+    const scrollbarWidth = scrollbarOffset ?? {
+      [ScrollAxis.Vertical]: guessScrollbarWidthVertical(),
+      [ScrollAxis.Horizontal]: guessScrollbarWidthHorizontal(),
+    };
 
     const originalOverflow = target.style.overflow;
     const originalPaddingRight = target.style.paddingRight;

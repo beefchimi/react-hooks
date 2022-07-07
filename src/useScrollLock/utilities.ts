@@ -1,9 +1,10 @@
 import {detectHasDom} from '../utilities';
 
+import {isScrollbarWidthNumber} from './type-guards';
 import {ScrollAxis} from './types';
 import type {
+  ScrollbarWidth,
   DefaultScrollLockOptions,
-  ScrollLockOptions,
   ScrollLockCapturedProperties,
   RequiredTarget,
 } from './types';
@@ -19,11 +20,19 @@ function getTargetStyle({target, property}: TargetStyleCriteria) {
     : 0;
 }
 
-export function guessScrollbarWidth() {
+export function guessScrollbarWidthVertical() {
   // A better alternative might be:
   // (target || document.body).offsetWidth - (target || document.body).scrollWidth
   return detectHasDom()
     ? window.innerWidth - document.documentElement.clientWidth
+    : 0;
+}
+
+export function guessScrollbarWidthHorizontal() {
+  // A better alternative might be:
+  // (target || document.body).offsetHeight - (target || document.body).scrollHeight
+  return detectHasDom()
+    ? window.innerHeight - document.documentElement.clientHeight
     : 0;
 }
 
@@ -33,7 +42,7 @@ export function guessScrollbarWidth() {
 interface ApplyScrollStylesCriteria {
   target: RequiredTarget;
   scrollAxis: DefaultScrollLockOptions['scrollAxis'];
-  scrollbarWidth: NonNullable<ScrollLockOptions['scrollbarOffset']>;
+  scrollbarWidth: ScrollbarWidth;
 }
 
 interface ResetScrollStylesCriteria {
@@ -48,14 +57,27 @@ function applyScrollPadding({
   scrollAxis,
   scrollbarWidth,
 }: ApplyScrollStylesCriteria) {
-  const captured: ScrollLockCapturedProperties = {scrollbarWidth};
+  const verticalWidth = isScrollbarWidthNumber(scrollbarWidth)
+    ? scrollbarWidth
+    : scrollbarWidth[ScrollAxis.Vertical];
+
+  const horizontalWidth = isScrollbarWidthNumber(scrollbarWidth)
+    ? scrollbarWidth
+    : scrollbarWidth[ScrollAxis.Horizontal];
+
+  const captured: ScrollLockCapturedProperties = {
+    scrollbarWidth: {
+      [ScrollAxis.Vertical]: verticalWidth,
+      [ScrollAxis.Horizontal]: horizontalWidth,
+    },
+  };
 
   if (scrollAxis === ScrollAxis.Vertical || scrollAxis === ScrollAxis.Both) {
     captured.paddingRight = getTargetStyle({
       target,
       property: 'padding-right',
     });
-    captured.appliedPaddingRight = captured.paddingRight + scrollbarWidth;
+    captured.appliedPaddingRight = captured.paddingRight + verticalWidth;
 
     target.style.paddingRight = `${captured.appliedPaddingRight}px`;
   }
@@ -65,11 +87,9 @@ function applyScrollPadding({
       target,
       property: 'padding-bottom',
     });
-    captured.appliedPaddingBottom = captured.paddingBottom + scrollbarWidth;
+    captured.appliedPaddingBottom = captured.paddingBottom + horizontalWidth;
 
-    target.style.paddingBottom = `${
-      captured.appliedPaddingBottom + scrollbarWidth
-    }px`;
+    target.style.paddingBottom = `${captured.appliedPaddingBottom}px`;
   }
 
   return captured;
@@ -81,10 +101,7 @@ export function applyScrollStyles({
   scrollbarWidth,
 }: ApplyScrollStylesCriteria) {
   target.style.overflow = 'hidden';
-
-  return scrollbarWidth
-    ? applyScrollPadding({target, scrollAxis, scrollbarWidth})
-    : {};
+  return applyScrollPadding({target, scrollAxis, scrollbarWidth});
 }
 
 export function resetScrollStyles({
