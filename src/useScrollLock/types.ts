@@ -7,13 +7,20 @@ export type ScrollLockHookReturn = [boolean, Dispatch<SetStateAction<boolean>>];
 
 // eslint-disable-next-line @beefchimi/typescript/prefer-singular-enums
 export enum ScrollAxis {
-  Horizontal = 'x',
-  Vertical = 'y',
+  Vertical = 'vertical',
+  Horizontal = 'horizontal',
   Both = 'both',
 }
 
+export interface ScrollbarWidthDualAxis {
+  [ScrollAxis.Vertical]: number;
+  [ScrollAxis.Horizontal]: number;
+}
+
+export type ScrollbarWidth = ScrollbarWidthDualAxis | number;
+
 export interface ScrollLockCapturedProperties {
-  scrollbarWidth?: number;
+  scrollbarWidth: ScrollbarWidthDualAxis;
   paddingRight?: number;
   appliedPaddingRight?: number;
   paddingBottom?: number;
@@ -23,16 +30,7 @@ export interface ScrollLockCapturedProperties {
 export interface ScrollLockOptions {
   target?: HTMLElement | null;
   scrollAxis?: ScrollAxis;
-
-  // There is intentionally only one "scrollbar size" for both
-  // `x` and `y` axis. Supporting the case where sizes would be different
-  // is so rare that it isn't worth the complexity.
-  scrollbarOffset?: number;
-
-  // Consider a prop that allows skipping the
-  // scrollbar width `padding-right` reservation.
-  // bypassScrollPadding?: boolean;
-
+  scrollbarOffset?: ScrollbarWidth;
   onLock?(captured: ScrollLockCapturedProperties): void;
   onUnlock?(): void;
 }
