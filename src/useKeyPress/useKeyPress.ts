@@ -30,7 +30,7 @@ export function useKeyPress(
   const callbackRef = useRef(callback);
 
   const handleCallback: KeyPressCallback = useCallback(
-    (event: KeyboardEvent) => {
+    (event) => {
       const requiredKeysEngaged = keys.some((key) => event.key === key);
 
       if (requiredKeysEngaged) {
