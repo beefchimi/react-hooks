@@ -1,4 +1,4 @@
-import type {GlobalEventCallback, GlobalEventTarget} from '../types';
+import type {GlobalEventTarget} from '../types';
 
 export enum KeyPressEventType {
   Down = 'keydown',
@@ -6,9 +6,7 @@ export enum KeyPressEventType {
   Up = 'keyup',
 }
 
-// TODO: Figure out how to type this for `KeyboardEvent`.
-// TypeScript complains about the `event` type.
-export type KeyPressCallback = GlobalEventCallback;
+export type KeyPressCallback = (event: KeyboardEvent) => void;
 export type KeyPressInput = string[];
 
 // TODO: Consider a `preferKeyCode` boolean option:
