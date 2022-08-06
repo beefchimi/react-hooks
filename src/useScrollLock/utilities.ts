@@ -9,54 +9,25 @@ import type {
   RequiredTarget,
 } from './types';
 
-interface TargetStyleCriteria {
-  target: RequiredTarget;
-  property: string;
-}
+type TargetPadding = 'padding-right' | 'padding-bottom';
 
-function getTargetStyle({target, property}: TargetStyleCriteria) {
-  return detectHasDom()
-    ? parseInt(window.getComputedStyle(target).getPropertyValue(property), 10)
-    : 0;
-}
-
-export function guessScrollbarWidthVertical() {
-  // A better alternative might be:
-  // (target || document.body).offsetWidth - (target || document.body).scrollWidth
-  return detectHasDom()
-    ? window.innerWidth - document.documentElement.clientWidth
-    : 0;
-}
-
-export function guessScrollbarWidthHorizontal() {
-  // A better alternative might be:
-  // (target || document.body).offsetHeight - (target || document.body).scrollHeight
-  return detectHasDom()
-    ? window.innerHeight - document.documentElement.clientHeight
-    : 0;
-}
-
-///
-/// DOM mutation (side-effects)
-
-interface ApplyScrollStylesCriteria {
+interface CapturedPropertiesCriteria {
   target: RequiredTarget;
   scrollAxis: DefaultScrollLockOptions['scrollAxis'];
   scrollbarWidth: ScrollbarWidth;
 }
 
-interface ResetScrollStylesCriteria {
-  target: RequiredTarget;
-  overflow: string;
-  paddingRight: string;
-  paddingBottom: string;
+function getTargetPadding(target: RequiredTarget, padding: TargetPadding) {
+  return detectHasDom()
+    ? parseInt(window.getComputedStyle(target).getPropertyValue(padding), 10)
+    : 0;
 }
 
-function applyScrollPadding({
+function getCapturedProperties({
   target,
   scrollAxis,
   scrollbarWidth,
-}: ApplyScrollStylesCriteria) {
+}: CapturedPropertiesCriteria) {
   const verticalWidth = isScrollbarWidthNumber(scrollbarWidth)
     ? scrollbarWidth
     : scrollbarWidth[ScrollAxis.Vertical];
@@ -72,36 +43,74 @@ function applyScrollPadding({
     },
   };
 
-  if (scrollAxis === ScrollAxis.Vertical || scrollAxis === ScrollAxis.Both) {
-    captured.paddingRight = getTargetStyle({
-      target,
-      property: 'padding-right',
-    });
-    captured.appliedPaddingRight = captured.paddingRight + verticalWidth;
+  // If there is no vertical or horizontal scrollbar,
+  // we don't need to bother detecting and applying `padding`.
 
-    target.style.paddingRight = `${captured.appliedPaddingRight}px`;
+  if (verticalWidth === 0 && horizontalWidth === 0) {
+    return captured;
+  }
+
+  if (scrollAxis === ScrollAxis.Vertical || scrollAxis === ScrollAxis.Both) {
+    captured.paddingRight = getTargetPadding(target, 'padding-right');
+    captured.appliedPaddingRight = captured.paddingRight + verticalWidth;
   }
 
   if (scrollAxis === ScrollAxis.Horizontal || scrollAxis === ScrollAxis.Both) {
-    captured.paddingBottom = getTargetStyle({
-      target,
-      property: 'padding-bottom',
-    });
+    captured.paddingBottom = getTargetPadding(target, 'padding-bottom');
     captured.appliedPaddingBottom = captured.paddingBottom + horizontalWidth;
-
-    target.style.paddingBottom = `${captured.appliedPaddingBottom}px`;
   }
 
   return captured;
+}
+
+///
+/// Scrollbar measurements
+
+export function guessScrollbarWidthVertical() {
+  // TODO: A better alternative might be:
+  // (target || document.body).offsetWidth - (target || document.body).scrollWidth
+  return detectHasDom()
+    ? window.innerWidth - document.documentElement.clientWidth
+    : 0;
+}
+
+export function guessScrollbarWidthHorizontal() {
+  // TODO: A better alternative might be:
+  // (target || document.body).offsetHeight - (target || document.body).scrollHeight
+  return detectHasDom()
+    ? window.innerHeight - document.documentElement.clientHeight
+    : 0;
+}
+
+///
+/// DOM mutation (side-effects)
+
+interface ResetScrollStylesCriteria {
+  target: RequiredTarget;
+  overflow: string;
+  paddingRight: string;
+  paddingBottom: string;
 }
 
 export function applyScrollStyles({
   target,
   scrollAxis,
   scrollbarWidth,
-}: ApplyScrollStylesCriteria) {
+}: CapturedPropertiesCriteria) {
+  const captured = getCapturedProperties({target, scrollAxis, scrollbarWidth});
+  const {appliedPaddingRight, appliedPaddingBottom} = captured;
+
+  if (appliedPaddingRight) {
+    target.style.paddingRight = `${appliedPaddingRight}px`;
+  }
+
+  if (appliedPaddingBottom) {
+    target.style.paddingBottom = `${appliedPaddingBottom}px`;
+  }
+
   target.style.overflow = 'hidden';
-  return applyScrollPadding({target, scrollAxis, scrollbarWidth});
+
+  return captured;
 }
 
 export function resetScrollStyles({
