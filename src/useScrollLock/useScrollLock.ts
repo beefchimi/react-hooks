@@ -37,16 +37,15 @@ export function useScrollLock(
       return;
     }
 
+    // Capture the original values to restore later.
+    const {overflow, paddingRight, paddingBottom} = target.style;
+
     // An explicitly passed `scrollbarOffset` could be `0`,
     // so we will accept that value if passed.
     const scrollbarWidth = scrollbarOffset ?? {
       [ScrollAxis.Vertical]: guessScrollbarWidthVertical(),
       [ScrollAxis.Horizontal]: guessScrollbarWidthHorizontal(),
     };
-
-    const originalOverflow = target.style.overflow;
-    const originalPaddingRight = target.style.paddingRight;
-    const originalPaddingBottom = target.style.paddingBottom;
 
     const captured = applyScrollStyles({
       target,
@@ -59,13 +58,7 @@ export function useScrollLock(
     // TODO: Adjust linting so that an early return is acceptable.
     // eslint-disable-next-line consistent-return
     return () => {
-      resetScrollStyles({
-        target,
-        overflow: originalOverflow,
-        paddingRight: originalPaddingRight,
-        paddingBottom: originalPaddingBottom,
-      });
-
+      resetScrollStyles({target, overflow, paddingRight, paddingBottom});
       onUnlock?.();
     };
   }, [scrollingLocked, target, scrollAxis, scrollbarOffset, onLock, onUnlock]);
