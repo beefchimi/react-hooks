@@ -8,6 +8,9 @@ export interface ScrollLockComponentProps {
   parentTarget?: boolean;
 }
 
+const TOGGLE_TEXT_LOCKED = 'Locked';
+const TOGGLE_TEXT_UNLOCKED = 'Unlocked';
+
 export function ScrollLockComponent({
   parentTarget = false,
 }: ScrollLockComponentProps) {
@@ -25,7 +28,7 @@ export function ScrollLockComponent({
   return (
     <div ref={parentRef} className="ScrollLockComponent">
       <button ref={buttonRef} type="button" onClick={handleScrollLockToggle}>
-        {scrollingLocked ? 'Locked' : 'Unlocked'}
+        {scrollingLocked ? TOGGLE_TEXT_LOCKED : TOGGLE_TEXT_UNLOCKED}
       </button>
 
       <p>Long scrolling content goes here.</p>

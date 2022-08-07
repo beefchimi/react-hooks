@@ -2,20 +2,50 @@ import {renderHook} from '@testing-library/react-hooks';
 
 import {useScrollLock} from '../useScrollLock';
 
+// TODO: Tests have not yet been authored for this hook.
+// However, a sandbox has been created:
+// https://codesandbox.io/s/usescrolllock-6ocshv
 describe('useScrollLock', () => {
-  it('is `true` upon `mount`', async () => {
-    const {result} = renderHook(() => useScrollLock());
-    const [scrollingLocked] = result.current;
+  describe('scrollingLocked', () => {
+    it('is `false` upon `mount`', async () => {
+      const {result} = renderHook(() => useScrollLock());
+      const [scrollingLocked] = result.current;
 
-    expect(scrollingLocked).toBe(true);
+      expect(scrollingLocked).toBe(false);
+    });
+
+    it.todo('set back to `false` upon `unmount`');
   });
 
-  it('is `false` upon `unmount`', async () => {
-    const {result, unmount} = renderHook(() => useScrollLock());
-    const [scrollingLocked] = result.current;
+  describe('setScrollLock', () => {
+    it.todo('updates `scrollingLocked` state');
+  });
 
-    unmount();
+  describe('options > target', () => {
+    it.todo('defaults to `document.body`');
 
-    expect(scrollingLocked).toBe(false);
+    it.todo('uses custom `target`');
+  });
+
+  describe('options > scrollAxis', () => {
+    it.todo('defaults to `vertical`');
+
+    it.todo('allows `horizontal` scrolling');
+
+    it.todo('allows scrolling on both axis');
+  });
+
+  describe('options > scrollbarOffset', () => {
+    it.todo('accepts custom `width`');
+
+    it.todo('allows bypassing `padding` styles');
+  });
+
+  describe('options > onLock', () => {
+    it.todo('is called with `captured`');
+  });
+
+  describe('options > onUnlock', () => {
+    it.todo('is called without arguments');
   });
 });
