@@ -6,6 +6,7 @@ import type {
   ScrollbarWidth,
   DefaultScrollLockOptions,
   ScrollLockCapturedProperties,
+  OptionalTarget,
   RequiredTarget,
 } from './types';
 
@@ -66,20 +67,26 @@ function getCapturedProperties({
 ///
 /// Scrollbar measurements
 
-export function guessScrollbarWidthVertical() {
-  // TODO: A better alternative might be:
-  // (target || document.body).offsetWidth - (target || document.body).scrollWidth
-  return detectHasDom()
-    ? window.innerWidth - document.documentElement.clientWidth
-    : 0;
+export function guessScrollbarWidthVertical(target?: OptionalTarget) {
+  if (!detectHasDom()) {
+    return 0;
+  }
+
+  // `target` measurements do not account for `border` styles.
+  return target
+    ? target.offsetWidth - target.clientWidth
+    : window.innerWidth - document.documentElement.clientWidth;
 }
 
-export function guessScrollbarWidthHorizontal() {
-  // TODO: A better alternative might be:
-  // (target || document.body).offsetHeight - (target || document.body).scrollHeight
-  return detectHasDom()
-    ? window.innerHeight - document.documentElement.clientHeight
-    : 0;
+export function guessScrollbarWidthHorizontal(target?: OptionalTarget) {
+  if (!detectHasDom()) {
+    return 0;
+  }
+
+  // `target` measurements do not account for `border` styles.
+  return target
+    ? target.offsetHeight - target.clientHeight
+    : window.innerHeight - document.documentElement.clientHeight;
 }
 
 ///

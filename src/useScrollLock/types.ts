@@ -39,4 +39,5 @@ export interface DefaultScrollLockOptions extends ScrollLockOptions {
   scrollAxis: NonNullable<ScrollLockOptions['scrollAxis']>;
 }
 
-export type RequiredTarget = NonNullable<ScrollLockOptions['target']>;
+export type OptionalTarget = ScrollLockOptions['target'];
+export type RequiredTarget = NonNullable<OptionalTarget>;

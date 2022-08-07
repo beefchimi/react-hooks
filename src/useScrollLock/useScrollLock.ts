@@ -32,6 +32,11 @@ export function useScrollLock(
     ...filterNullishValuesFromObject<ScrollLockOptions>(options ?? {}),
   };
 
+  // If no `target` is passed, we assume the scrollable element
+  // is the `documentElement`. In this case, we do not want to
+  // pass the "fallback" `document.body`.
+  const scrollbarTarget = options?.target ? target : undefined;
+
   useIsoLayoutEffect(() => {
     if (!scrollingLocked || !target) {
       return;
@@ -43,8 +48,8 @@ export function useScrollLock(
     // An explicitly passed `scrollbarOffset` could be `0`,
     // so we will accept that value if passed.
     const scrollbarWidth = scrollbarOffset ?? {
-      [ScrollAxis.Vertical]: guessScrollbarWidthVertical(),
-      [ScrollAxis.Horizontal]: guessScrollbarWidthHorizontal(),
+      [ScrollAxis.Vertical]: guessScrollbarWidthVertical(scrollbarTarget),
+      [ScrollAxis.Horizontal]: guessScrollbarWidthHorizontal(scrollbarTarget),
     };
 
     const captured = applyScrollStyles({
