@@ -1,4 +1,10 @@
-export {canUseDom} from './dom';
+export {
+  detectHasDom,
+  detectIsAndroid,
+  detectIsIpad,
+  detectIsIos,
+} from './detect';
+
 export {noop} from './noop';
 
 export {flipNumberSign, leftPadNumber} from './numbers';
