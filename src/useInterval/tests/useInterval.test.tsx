@@ -154,6 +154,49 @@ describe('useInterval', () => {
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
+    it.only('testing', async () => {
+      const mockCallback = vi.fn((timestamp) => {
+        // eslint-disable-next-line no-console
+        console.log(timestamp);
+      });
+
+      const {rerender} = renderHook(
+        ({playing}: IntervalHookOptions) =>
+          useInterval(mockCallback, {duration: mockDuration, playing}),
+        {initialProps: {playing: undefined}},
+      );
+
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(mockDuration / 2);
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(mockDuration / 2);
+      expect(mockCallback).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(mockDuration / 2);
+
+      rerender({playing: false});
+
+      vi.advanceTimersByTime(mockDuration);
+      expect(mockCallback).not.toHaveBeenCalledTimes(2);
+
+      /*
+      rerender({playing: true});
+
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(mockDuration / 2);
+      expect(mockCallback).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(mockDuration / 2);
+      expect(mockCallback).toHaveBeenCalled();
+      */
+
+      vi.advanceTimersByTime(mockDuration * 4);
+      expect(mockCallback).not.toHaveBeenCalledTimes(2);
+    });
+
     it('will restart the timeout from the beginning when toggled back and forth without `allowPausing`', async () => {
       const mockCallback = vi.fn((timestamp) => timestamp);
 

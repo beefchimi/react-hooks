@@ -50,6 +50,7 @@ export function useInterval(
   }, [initialTimeData.progress, initialTimeData.timeRemaining]);
 
   function handleCallback() {
+    console.log('handleCallback');
     resetTimeData();
     startTime.current = Date.now();
     callbackRef.current?.(startTime.current);
@@ -100,6 +101,7 @@ export function useInterval(
     }
 
     return () => {
+      console.log('teardown > intervalRef.current', intervalRef.current);
       // TODO: Unfortunate typecasting because of dual DOM/Node environment.
       clearInterval(intervalRef.current as unknown as number);
       clearTimeout(timeoutRef.current as unknown as number);
@@ -125,4 +127,6 @@ export function useInterval(
       mountedRef.current = false;
     };
   }, []);
+
+  console.log('intervalRef.current', intervalRef.current);
 }
